@@ -3,6 +3,8 @@
 #include "FloorSensor.h"
 #include "Building.h"
 #include "defs.h"
+#include <cmath>
+#include <queue>
 
 #include <vector>
 
@@ -24,7 +26,7 @@ Accessed by classes as a pointer since it is a large object and all classes shou
 */
 class ECS {
 public:
-    ECS(vector<Elevator*>, vector<Floor*>, Building*, vector<int>);
+    ECS(vector<Elevator*>& elevators, vector<Floor*>& floors, vector<vector<FloorSensor*>>& allSetsOfFloorSensors, Building* building);
     ~ECS();
 
     void assignToElevatorQueue(int elevatorNum, int floorNum);
@@ -34,10 +36,10 @@ public:
     void moveElevatorsTowardsDestination();
     int getElevatorFloorNum(int elevatorNum);
     void readyToGoAfterTenSeconds(int elevatorNum);
-    void passengerLeaving(int elevatorNum);
     void arrivedAtADesiredFloor(int elevatorNum, int floorNum);
 
 
+    void setStartingFloorValues(vector<int>& startingFloors);
 
     //LightSensor stuff
     void blockedDoorOnceRequest(int elevatorNum);
@@ -69,11 +71,14 @@ public:
 private:
     vector<Elevator*> elevators;
     vector<Floor*> floors;
-    vector<vector<int>> FloorQueues;
-    vector<vector<FloorSensor>> allSetsOfFloorSensors;
+    vector<queue<int>> floorQueues;
+    vector<vector<FloorSensor*>> allSetsOfFloorSensors;
     vector<int> currentElevatorFloorNumbers;
     vector<Direction> elevatorDirectionValues;
     Building *building;
+
+    vector<int> lastElementsInQueues;
+    vector<bool> areElevatorsMoving;
 
 
 };

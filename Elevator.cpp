@@ -1,7 +1,7 @@
 #include "Elevator.h"
 #include "ECS.h"
 
-Elevator::Elevator(int elevatorNum, vector<Button*>* destinationButtons, Button* openButton, Button* closeButton, Button* helpButton, Bell* bell, Door* elevatorDoor, Display* display, AudioSystem* audioSystem, WeightSensor* weightSensor, LightSensor* lightSensor, ECS* ecs){
+Elevator::Elevator(int elevatorNum, vector<Button*>& destinationButtons, Button* openButton, Button* closeButton, Button* helpButton, Bell* bell, Door* elevatorDoor, Display* display, AudioSystem* audioSystem, WeightSensor* weightSensor, LightSensor* lightSensor, ECS* ecs){
     this->elevatorNum = elevatorNum;
 
     this->currentWeight = 0;
@@ -22,10 +22,9 @@ Elevator::Elevator(int elevatorNum, vector<Button*>* destinationButtons, Button*
 }
 
 Elevator::~Elevator(){
-    for(int i = 0; i < destinationButtons->size(); i++){
-        delete destinationButtons->at(i);
+    for(int i = 0; i < destinationButtons.size(); i++){
+        delete destinationButtons.at(i);
     }
-    delete destinationButtons;
     delete openButton;
     delete closeButton;
     delete helpButton;
@@ -39,8 +38,8 @@ Elevator::~Elevator(){
 
 
 void Elevator::stopElevator(){
-    if(destinationButtons->at(getElevatorFloorNum()-1)->isIlluminated()){
-        destinationButtons->at(getElevatorFloorNum()-1)->turnOffLight();
+    if(destinationButtons.at(getElevatorFloorNum()-1)->isIlluminated()){
+        destinationButtons.at(getElevatorFloorNum()-1)->turnOffLight();
     }
     bell->ringBell();
     elevatorDoor->openDoor();
@@ -52,12 +51,14 @@ void Elevator::startElevator(){
 }
 
 void Elevator::pressDestinationButton(int floorNum){
-    destinationButtons->at(floorNum-1)->illuminate();
+    destinationButtons.at(floorNum-1)->illuminate();
     ecs->addDestinationFloorRequest(elevatorNum, floorNum);
+    ecs->readyToGoAfterTenSeconds(elevatorNum);
 }
 
 void Elevator::updateCurrentFloorNum(int floorNum){
     ecs->updateElevatorFloor(elevatorNum, floorNum);
+    display->displayFloor(floorNum);
 }
 
 int Elevator::getElevatorFloorNum(){

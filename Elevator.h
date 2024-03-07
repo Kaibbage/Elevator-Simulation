@@ -23,7 +23,7 @@ accessed as a pointer as it is a huge object and multiple classes may need to ac
 */
 class Elevator {
 public:
-    Elevator(int elevatorNum, vector<Button*>* destinationButtons, Button* openButton, Button* closeButton, Button* helpButton, Bell* bell, Door* elevatorDoor, Display* display, AudioSystem* audioSystem, WeightSensor* weightSensor, LightSensor* lightSensor, ECS* ecs);
+    Elevator(int elevatorNum, vector<Button*>& destinationButtons, Button* openButton, Button* closeButton, Button* helpButton, Bell* bell, Door* elevatorDoor, Display* display, AudioSystem* audioSystem, WeightSensor* weightSensor, LightSensor* lightSensor, ECS* ecs);
     ~Elevator();
 
     void stopElevator();
@@ -68,7 +68,7 @@ private:
     int currentWeight;
     bool lastDisplayWasMsg;
     bool emergencyMode;
-    vector<Button*>* destinationButtons;
+    vector<Button*> destinationButtons;
     Button* openButton;
     Button* closeButton;
     Button* helpButton;
