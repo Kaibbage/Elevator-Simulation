@@ -32,6 +32,7 @@ public:
     void updateCurrentFloorNum(int floorNum);
     int getElevatorFloorNum();
 
+    void setECS(ECS* ecs);
 
 
     //weight stuff
@@ -61,6 +62,20 @@ public:
     //extras
     void pressOpenDoorButton();
     void pressCloseDoorButton();
+
+
+
+    //getters
+    vector<Button*> getDestinationButtons();
+    Button* getOpenButton();
+    Button* getCloseButton();
+    Button* getHelpButton();
+    Bell* getBell();
+    Door* getElevatorDoor();
+    Display* getDisplay();
+    AudioSystem* getAudioSystem();
+    WeightSensor* getWeightSensor();
+    LightSensor* getLightSensor();
 
 
 private:

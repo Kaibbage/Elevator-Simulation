@@ -38,8 +38,8 @@ Elevator::~Elevator(){
 
 
 void Elevator::stopElevator(){
-    if(destinationButtons.at(getElevatorFloorNum()-1)->isIlluminated()){
-        destinationButtons.at(getElevatorFloorNum()-1)->turnOffLight();
+    if(destinationButtons.at(getElevatorFloorNum())->isIlluminated()){
+        destinationButtons.at(getElevatorFloorNum())->turnOffLight();
     }
     bell->ringBell();
     elevatorDoor->openDoor();
@@ -51,16 +51,53 @@ void Elevator::startElevator(){
 }
 
 void Elevator::pressDestinationButton(int floorNum){
-    destinationButtons.at(floorNum-1)->illuminate();
+    destinationButtons.at(floorNum)->illuminate();
     ecs->addDestinationFloorRequest(elevatorNum, floorNum);
-    ecs->readyToGoAfterTenSeconds(elevatorNum);
+
 }
 
 void Elevator::updateCurrentFloorNum(int floorNum){
+    display->displayFloor(floorNum+1);
     ecs->updateElevatorFloor(elevatorNum, floorNum);
-    display->displayFloor(floorNum);
+
 }
 
 int Elevator::getElevatorFloorNum(){
     return ecs->getElevatorFloorNum(elevatorNum);
+}
+
+void Elevator::setECS(ECS* ecs){
+    this->ecs = ecs;
+}
+
+
+vector<Button*> Elevator::getDestinationButtons(){
+    return destinationButtons;
+}
+Button* Elevator::getOpenButton(){
+    return openButton;
+}
+Button* Elevator::getCloseButton(){
+    return closeButton;
+}
+Button* Elevator::getHelpButton(){
+    return helpButton;
+}
+Bell* Elevator::getBell(){
+    return bell;
+}
+Door* Elevator::getElevatorDoor(){
+    return elevatorDoor;
+}
+Display* Elevator::getDisplay(){
+    return display;
+}
+AudioSystem* Elevator::getAudioSystem(){
+    return audioSystem;
+}
+WeightSensor* Elevator::getWeightSensor(){
+    return weightSensor;
+}
+LightSensor* Elevator::getLightSensor(){
+    return lightSensor;
 }

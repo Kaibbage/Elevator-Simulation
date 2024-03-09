@@ -40,3 +40,21 @@ void Floor::arrived(){
 void Floor::leaving(){
     floorDoor->closeDoor();
 }
+
+void Floor::setECS(ECS* ecs){
+    this->ecs = ecs;
+}
+
+
+int Floor::getFloorNum(){
+    return floorNum;
+}
+Button* Floor::getUpButton(){
+    return upButton;
+}
+Button* Floor::getDownButton(){
+    return downButton;
+}
+Door* Floor::getFloorDoor(){
+    return floorDoor;
+}

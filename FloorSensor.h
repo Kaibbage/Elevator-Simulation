@@ -10,16 +10,18 @@ Each elevator has its own set of floor sensors (there are 3 elevators and 7 floo
 For the same of the simulation the ECS calls these, this would not be the case in real life, but it makes sense for the simulation
 Not accessed as a pointer because it is small and each floor sensor is only accessed by one object (ecs)
 */
-class FloorSensor {
+class FloorSensor: public QObject {
+    Q_OBJECT
 public:
-    FloorSensor(Elevator*);
+    FloorSensor(int floorNum, Elevator* elevator);
     void detected();
 
 private:
     int floorNum;
     Elevator *elevator;
 
-
+signals:
+    void signalArrivedAtFloor(int floorNum);
 };
 
 #endif

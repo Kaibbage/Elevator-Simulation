@@ -5,6 +5,8 @@
 #include "defs.h"
 #include <cmath>
 #include <queue>
+#include <QObject>
+#include "IntegerTimer.h"
 
 #include <vector>
 
@@ -24,7 +26,8 @@ All requests that come to an elevator come here first to get instructions for th
 Controls all elevators and all floors
 Accessed by classes as a pointer since it is a large object and all classes should access the same ecs
 */
-class ECS {
+class ECS: public QObject {
+    Q_OBJECT
 public:
     ECS(vector<Elevator*>& elevators, vector<Floor*>& floors, vector<vector<FloorSensor*>>& allSetsOfFloorSensors, Building* building);
     ~ECS();
@@ -35,11 +38,14 @@ public:
     void updateElevatorFloor(int elevatorNum, int floorNum);
     void moveElevatorsTowardsDestination();
     int getElevatorFloorNum(int elevatorNum);
-    void readyToGoAfterTenSeconds(int elevatorNum);
+
     void arrivedAtADesiredFloor(int elevatorNum, int floorNum);
 
 
     void setStartingFloorValues(vector<int>& startingFloors);
+
+    vector<Floor*> &getFloors();
+    vector<Elevator*> &getElevators();
 
     //LightSensor stuff
     void blockedDoorOnceRequest(int elevatorNum);
@@ -78,8 +84,12 @@ private:
     Building *building;
 
     vector<int> lastElementsInQueues;
-    vector<bool> areElevatorsMoving;
+    vector<bool> areElevatorsReadyToMove;
 
+    IntegerTimer tenSecondTimer;
+
+public slots:
+    void readyToGoAfterTenSeconds(int elevatorNum);
 
 };
 

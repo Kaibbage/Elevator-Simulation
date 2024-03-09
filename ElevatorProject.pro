@@ -19,6 +19,8 @@ SOURCES += \
     Elevator.cpp \
     Floor.cpp \
     FloorSensor.cpp \
+    IntegerPushButton.cpp \
+    IntegerTimer.cpp \
     LightSensor.cpp \
     WeightSensor.cpp \
     main.cpp \
@@ -35,6 +37,8 @@ HEADERS += \
     Elevator.h \
     Floor.h \
     FloorSensor.h \
+    IntegerPushButton.h \
+    IntegerTimer.h \
     LightSensor.h \
     WeightSensor.h \
     defs.h \

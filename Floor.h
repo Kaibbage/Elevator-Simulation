@@ -25,6 +25,13 @@ public:
     void arrived();
     void leaving();
 
+    void setECS(ECS* ecs);
+
+    int getFloorNum();
+    Button* getUpButton();
+    Button* getDownButton();
+    Door* getFloorDoor();
+
 
 private:
     int floorNum;
