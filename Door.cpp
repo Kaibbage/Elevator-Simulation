@@ -1,18 +1,19 @@
 #include "Door.h"
 
-Door::Door(){
+Door::Door(int objectNum){
+    this->objectNum = objectNum;
     isOpen = false;
     closeDoor();
 }
 
 void Door::openDoor(){
     isOpen = true;
-    emit sendDoorOpenSignal(isOpen);
+    emit sendDoorOpenSignal(objectNum, true);
 }
 
 void Door::closeDoor(){
     isOpen = false;
-    emit sendDoorOpenSignal(isOpen);
+    emit sendDoorOpenSignal(objectNum, false);
 }
 
 bool Door::isDoorOpen(){

@@ -12,16 +12,17 @@ class Door: public QObject {
 Q_OBJECT
 
 public:
-    Door();
+    Door(int objectNum = -1);
     void openDoor();
     void closeDoor();
     bool isDoorOpen();
 
 private:
+    int objectNum;
     bool isOpen;
 
 signals:
-    void sendDoorOpenSignal(bool isOpen);
+    void sendDoorOpenSignal(int objectNum, bool isOpen);
 };
 
 #endif

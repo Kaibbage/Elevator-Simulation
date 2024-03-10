@@ -25,7 +25,7 @@ MainWindow::MainWindow(QWidget *parent)
         Button* closeButton = new Button();
         Button* helpButton = new Button();
         Bell* bell = new Bell();
-        Door* eDoor = new Door();
+        Door* eDoor = new Door(i);
         Display* display = new Display();
         AudioSystem* audioSystem = new AudioSystem();
         WeightSensor* weightSensor = new WeightSensor();
@@ -44,7 +44,7 @@ MainWindow::MainWindow(QWidget *parent)
         int floorNum = i;
         Button* upButton = new Button();
         Button* downButton = new Button();
-        Door* floorDoor = new Door();
+        Door* floorDoor = new Door(i);
 
         Floor* floor = new Floor(floorNum, upButton, downButton, floorDoor, nullptr);
         floors.push_back(floor);
@@ -105,12 +105,15 @@ MainWindow::MainWindow(QWidget *parent)
         QTextBrowser *eDoor = new QTextBrowser(ui->centralwidget);
         eDoor->setGeometry(70 + (60*i), 510, 60, 30);
         elevatorDoorLayout.push_back(eDoor);
+        connect(ecs->getElevators().at(i)->getElevatorDoor(), SIGNAL(sendDoorOpenSignal(int, bool)), this, SLOT(manageElevatorDoor(int, bool)));
+        manageElevatorDoor(i, false);
     }
-
     for(int i = 0; i < NUM_FLOORS; i++){
         QTextBrowser *fDoor = new QTextBrowser(ui->centralwidget);
         fDoor->setGeometry(20, 430 - (60*i), 30, 60);
         floorDoorLayout.push_back(fDoor);
+        connect(ecs->getFloors().at(i)->getFloorDoor(), SIGNAL(sendDoorOpenSignal(int, bool)), this, SLOT(manageFloorDoor(int, bool)));
+        manageFloorDoor(i, false);
     }
 
     //Setting base elevators and floor on GUI to be first elevator and first floor
@@ -310,27 +313,46 @@ void MainWindow::floorSensorArrivedDisplay(int elevatorNum, int floorNum){
 
 void MainWindow::manageIlluminationDestinationButton(int destinationNum, bool illuminate){
     if(illuminate == true){
-        qDestButtons.at(destinationNum)->setStyleSheet("background-color: yellow");
+        qDestButtons.at(destinationNum)->setStyleSheet("background-color: yellow;");
     }
     else{
-        qDestButtons.at(destinationNum)->setStyleSheet("background-color: white");
+        qDestButtons.at(destinationNum)->setStyleSheet("background-color: white;");
     }
 }
 
 void MainWindow::manageIlluminationUpButton(int destinationNum, bool illuminate){
     if(illuminate == true){
-        ui->upButton->setStyleSheet("background-color: yellow");
+        ui->upButton->setStyleSheet("background-color: yellow;");
     }
     else{
-        ui->upButton->setStyleSheet("background-color: white");
+        ui->upButton->setStyleSheet("background-color: white;");
     }
 }
 
 void MainWindow::manageIlluminationDownButton(int destinationNum, bool illuminate){
     if(illuminate == true){
-        ui->downButton->setStyleSheet("background-color: yellow");
+        ui->downButton->setStyleSheet("background-color: yellow;");
     }
     else{
-        ui->downButton->setStyleSheet("background-color: white");
+        ui->downButton->setStyleSheet("background-color: white;");
     }
+}
+
+void MainWindow::manageElevatorDoor(int elevatorNum, bool open){
+    if(open == true){
+        elevatorDoorLayout.at(elevatorNum)->setStyleSheet("background-color: green;");
+    }
+    else{
+        elevatorDoorLayout.at(elevatorNum)->setStyleSheet("background-color: red;");
+    }
+
+}
+void MainWindow::manageFloorDoor(int floorNum, bool open){
+    if(open == true){
+        floorDoorLayout.at(floorNum)->setStyleSheet("background-color: green;");
+    }
+    else{
+        floorDoorLayout.at(floorNum)->setStyleSheet("background-color: red;");
+    }
+
 }

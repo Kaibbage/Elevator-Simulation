@@ -58,5 +58,8 @@ public slots:
     void manageIlluminationDestinationButton(int, bool);
     void manageIlluminationUpButton(int, bool);
     void manageIlluminationDownButton(int, bool);
+
+    void manageElevatorDoor(int, bool);
+    void manageFloorDoor(int, bool);
 };
 #endif // MAINWINDOW_H
