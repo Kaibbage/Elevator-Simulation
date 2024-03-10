@@ -19,6 +19,9 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
+    void showFloorNum(int floorNum);
+    void showElevatorNum(int elevatorNum);
+
 private:
     Ui::MainWindow *ui;
     ECS* ecs;
@@ -28,6 +31,8 @@ private:
     int currentFloorNum;
     int currentElevatorNum;
     QTimer movementTimer;
+    vector<QTextBrowser*> floorDoorLayout;
+    vector<QTextBrowser*> elevatorDoorLayout;
 
 public slots:
     void ringBellGUI();
@@ -47,5 +52,11 @@ public slots:
     void changeElevator();
 
     void moveElevators();
+
+    void floorSensorArrivedDisplay(int elevatorNum, int floorNum);
+
+    void manageIlluminationDestinationButton(int, bool);
+    void manageIlluminationUpButton(int, bool);
+    void manageIlluminationDownButton(int, bool);
 };
 #endif // MAINWINDOW_H

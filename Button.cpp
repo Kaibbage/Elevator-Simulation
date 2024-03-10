@@ -1,18 +1,19 @@
 #include "Button.h"
 
-Button::Button(){
+Button::Button(int destinationNum){
+    this->destinationNum = destinationNum;
     illuminated = false;
     turnOffLight();
 }
 
 void Button::illuminate(){
     illuminated = true;
-    emit isIlluminatedSignal(illuminated);
+    emit isIlluminatedSignal(destinationNum, true);
 }
 
 void Button::turnOffLight(){
     illuminated = false;
-    emit isIlluminatedSignal(illuminated);
+    emit isIlluminatedSignal(destinationNum, false);
 }
 
 bool Button::isIlluminated(){

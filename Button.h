@@ -13,16 +13,18 @@ Not accessed as a pointer because it is small and each floor sensor is only acce
 class Button : public QObject{
     Q_OBJECT
 public:
-    Button();
+    Button(int objectNum = -1);
     void illuminate();
     void turnOffLight();
     bool isIlluminated(); //BNew
 
 private:
+    int destinationNum;
     bool illuminated;
 
+
 signals:
-    void isIlluminatedSignal(bool i);
+    void isIlluminatedSignal(int destinationNum, bool i);
 
 };
 

@@ -57,7 +57,7 @@ void Elevator::pressDestinationButton(int floorNum){
 }
 
 void Elevator::updateCurrentFloorNum(int floorNum){
-    display->displayFloor(floorNum+1);
+    display->displayFloor(floorNum);
     ecs->updateElevatorFloor(elevatorNum, floorNum);
 
 }
@@ -100,4 +100,7 @@ WeightSensor* Elevator::getWeightSensor(){
 }
 LightSensor* Elevator::getLightSensor(){
     return lightSensor;
+}
+int Elevator::getElevatorNum(){
+    return elevatorNum;
 }

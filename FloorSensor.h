@@ -21,7 +21,7 @@ private:
     Elevator *elevator;
 
 signals:
-    void signalArrivedAtFloor(int floorNum);
+    void signalArrivedAtFloor(int elevatorNum, int floorNum);
 };
 
 #endif

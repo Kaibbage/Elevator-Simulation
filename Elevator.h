@@ -31,6 +31,7 @@ public:
     void pressDestinationButton(int floorNum);
     void updateCurrentFloorNum(int floorNum);
     int getElevatorFloorNum();
+    int getElevatorNum();
 
     void setECS(ECS* ecs);
 

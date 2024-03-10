@@ -6,5 +6,5 @@ FloorSensor::FloorSensor(int floorNum, Elevator* elevator){
 }
 void FloorSensor::detected(){
     elevator->updateCurrentFloorNum(floorNum);
-    emit signalArrivedAtFloor(floorNum);
+    emit signalArrivedAtFloor(elevator->getElevatorNum(), floorNum);
 }

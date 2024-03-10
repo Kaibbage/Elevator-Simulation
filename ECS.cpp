@@ -63,8 +63,9 @@ void ECS::addStartingFloorRequest(int floorNum){
     bool prio1 = false;
     //bool needDisplay = false;
 
+    //This logic isn't perfect, need to fix
     for(int i = 0; i < elevators.size(); i++){
-        if(floorQueues.at(i).size() == 0 && abs(currentElevatorFloorNumbers.at(i) - floorNum) < closest){
+        if(floorQueues.at(i).size() == 0 && (abs(currentElevatorFloorNumbers.at(i) - floorNum) < closest || prio1 == false)){
             chosenElevatorNum = i;
             closest = abs(currentElevatorFloorNumbers.at(i) - floorNum);
             prio1 = true;

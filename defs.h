@@ -2,7 +2,7 @@
 #define DEFS_H
 
 #define NUM_FLOORS 7
-#define NUM_ELEVATORS 2
+#define NUM_ELEVATORS 3
 
 enum class Direction {
     Up,
