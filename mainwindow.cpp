@@ -82,7 +82,7 @@ MainWindow::MainWindow(QWidget *parent)
     //creating destination buttons and connecting
     for(int i = 0; i < NUM_FLOORS; i++){
         IntegerPushButton *button = new IntegerPushButton(i, QString::number(i+1), ui->centralwidget);
-        button->setGeometry(300, 420 - (50*i), 83, 25);
+        button->setGeometry(500, 520 - (50*i), 83, 25);
         qDestButtons.push_back(button);
 
         connect(button, SIGNAL(intValueClicked(int)), this, SLOT(clickDestinationButton(int)));
@@ -95,22 +95,35 @@ MainWindow::MainWindow(QWidget *parent)
         elevatorFloorLayout.push_back({});
         for(int j = 0; j < NUM_FLOORS; j++){
             QTextBrowser* block = new QTextBrowser(ui->centralwidget);
-            block->setGeometry(70 + (60*i), 430 - (60*j), 60, 60);
+            block->setGeometry(100 + (60*i), 500 - (60*j), 60, 60);
             elevatorFloorLayout.at(i).push_back(block);
         }
+    }
+
+    //creating labels for visual representations
+    for(int i = 0; i < NUM_ELEVATORS; i++){
+        QLabel* elevatorLabel = new QLabel("E" + QString::number(i+1), ui->centralwidget);
+        elevatorLabel->setGeometry(120 + (60*i), 563, 40, 10);
+        elevatorLabels.push_back(elevatorLabel);
+    }
+
+    for(int i = 0; i < NUM_FLOORS; i++){
+        QLabel* floorLabel = new QLabel("F" + QString::number(i+1), ui->centralwidget);
+        floorLabel->setGeometry(82, 520 - (60*i), 40, 10);
+        floorLabels.push_back(floorLabel);
     }
 
     //creating visual door representations for elevators and floors
     for(int i = 0; i < NUM_ELEVATORS; i++){
         QTextBrowser *eDoor = new QTextBrowser(ui->centralwidget);
-        eDoor->setGeometry(70 + (60*i), 510, 60, 30);
+        eDoor->setGeometry(100 + (60*i), 580, 60, 30);
         elevatorDoorLayout.push_back(eDoor);
         connect(ecs->getElevators().at(i)->getElevatorDoor(), SIGNAL(sendDoorOpenSignal(int, bool)), this, SLOT(manageElevatorDoor(int, bool)));
         manageElevatorDoor(i, false);
     }
     for(int i = 0; i < NUM_FLOORS; i++){
         QTextBrowser *fDoor = new QTextBrowser(ui->centralwidget);
-        fDoor->setGeometry(20, 430 - (60*i), 30, 60);
+        fDoor->setGeometry(50, 500 - (60*i), 30, 60);
         floorDoorLayout.push_back(fDoor);
         connect(ecs->getFloors().at(i)->getFloorDoor(), SIGNAL(sendDoorOpenSignal(int, bool)), this, SLOT(manageFloorDoor(int, bool)));
         manageFloorDoor(i, false);
@@ -172,7 +185,7 @@ MainWindow::~MainWindow()
 {
     delete ui;
     delete ecs;
-    for(int i = 0; i < qDestButtons.size(); i++){
+    for(int i = 0; i < NUM_FLOORS; i++){
         delete qDestButtons.at(i);
     }
     for(int i = 0; i < NUM_ELEVATORS; i++){
@@ -186,6 +199,13 @@ MainWindow::~MainWindow()
     for(int i = 0; i < NUM_FLOORS; i++){
         delete floorDoorLayout.at(i);
     }
+    for(int i = 0; i < NUM_ELEVATORS; i++){
+        delete elevatorLabels.at(i);
+    }
+    for(int i = 0; i < NUM_FLOORS; i++){
+        delete floorLabels.at(i);
+    }
+
 }
 
 

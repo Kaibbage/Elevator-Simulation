@@ -5,6 +5,7 @@
 #include <QPushButton>
 #include <QTextBrowser>
 #include <QTimer>
+#include <QLabel>
 #include "ECS.h"
 
 QT_BEGIN_NAMESPACE
@@ -33,6 +34,8 @@ private:
     QTimer movementTimer;
     vector<QTextBrowser*> floorDoorLayout;
     vector<QTextBrowser*> elevatorDoorLayout;
+    vector<QLabel*> elevatorLabels;
+    vector<QLabel*> floorLabels;
 
 public slots:
     void ringBellGUI();
