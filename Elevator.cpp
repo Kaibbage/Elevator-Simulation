@@ -26,6 +26,8 @@ Elevator::Elevator(int elevatorNum, vector<Button*>& destinationButtons, Button*
     powerOutTime = false;
 
     outOfOrder = false;
+
+    needHelp = false;
 }
 
 Elevator::~Elevator(){
@@ -150,6 +152,43 @@ void Elevator::emergencyStop(){
     audioSystem->outputAudioMessage(elevatorNum, "Please exit immediately");
     outOfOrder = true;
     ecs->noLongerRunning(elevatorNum);
+    fireTime = false;
+    powerOutTime = false;
+}
+
+void Elevator::powerOutage(){
+    display->displayMessage(elevatorNum, "This elevator is out of power, please exit when the doors open at the next floor");
+    audioSystem->outputAudioMessage(elevatorNum, "This elevator is out of power, please exit when the doors open at the next floor");
+    emergencyMode = true;
+    powerOutTime = true;
+}
+
+void Elevator::pressHelpButton(){
+    ecs->helpButtonRequest(elevatorNum);
+    helpButton->illuminate();
+    needHelp = true;
+}
+void Elevator::talk(){
+    ecs->talk(elevatorNum);
+    needHelp = false;
+    helpButton->turnOffLight();
+}
+
+void Elevator::pressOpenDoorButton(){
+    openButton->illuminate();
+    ecs->openButtonRequest(elevatorNum);
+}
+void Elevator::pressCloseDoorButton(){
+    closeButton->illuminate();
+    ecs->closeButtonRequest(elevatorNum);
+}
+void Elevator::letGoOpenDoorButton(){
+    openButton->turnOffLight();
+    ecs->letGoOpenButtonRequest(elevatorNum);
+}
+
+void Elevator::letGoCloseDoorButton(){
+    closeButton->turnOffLight();
 }
 
 vector<Button*> Elevator::getDestinationButtons(){
@@ -203,21 +242,19 @@ bool Elevator::getPowerOutTime(){
     return powerOutTime;
 }
 
-void Elevator::setWeightOverload(bool i){
-    weightOverload = i;
-}
-void Elevator::setLightSensorBlockedTwice(bool i){
-    lightSensorBlockedTwice = i;
-}
-void Elevator::setFireTime(bool i){
-    fireTime = i;
-}
-void Elevator::setPowerOutTime(bool i){
-    powerOutTime = i;
-}
+
 bool Elevator::getOutOfOrder(){
     return outOfOrder;
 }
-void Elevator::setOutOfOrder(bool outOfOrder){
-    this->outOfOrder = outOfOrder;
+
+bool Elevator::isDoorOpen(){
+    return elevatorDoor->isDoorOpen();
+}
+
+bool Elevator::getNeedHelp(){
+    return needHelp;
+}
+void Elevator::setNeedHelp(bool needHelp){
+    this->needHelp = needHelp;
+    helpButton->turnOffLight();
 }

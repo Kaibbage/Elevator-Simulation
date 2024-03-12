@@ -2,6 +2,7 @@
 #define BUTTON_H
 
 #include <QObject>
+#include "defs.h"
 
 /*
 Button class is very simple
@@ -13,7 +14,7 @@ Not accessed as a pointer because it is small and each floor sensor is only acce
 class Button : public QObject{
     Q_OBJECT
 public:
-    Button(int objectNum = -1);
+    Button(int objectNum = DEFAULT_VALUE);
     void illuminate();
     void turnOffLight();
     bool isIlluminated(); //BNew

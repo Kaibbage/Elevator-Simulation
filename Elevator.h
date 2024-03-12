@@ -52,16 +52,20 @@ public:
     //power outage stuff
     void powerOutage();
 
+    void emergencyStop();
+
     //help button stuff
     void pressHelpButton();
     void talk();
-    void dontTalkForFiveSeconds();
 
-    void emergencyStop();
+
 
     //extras
     void pressOpenDoorButton();
     void pressCloseDoorButton();
+
+    void letGoOpenDoorButton();
+    void letGoCloseDoorButton();
 
 
 
@@ -83,13 +87,12 @@ public:
     bool getFireTime();
     bool getPowerOutTime();
 
-    void setWeightOverload(bool);
-    void setLightSensorBlockedTwice(bool);
-    void setFireTime(bool);
-    void setPowerOutTime(bool);
-
     bool getOutOfOrder();
-    void setOutOfOrder(bool);
+
+    bool getNeedHelp();
+    void setNeedHelp(bool needHelp);
+
+    bool isDoorOpen();
 
 
 private:
@@ -115,6 +118,8 @@ private:
     bool powerOutTime;
 
     bool outOfOrder;
+
+    bool needHelp;
 
 
 

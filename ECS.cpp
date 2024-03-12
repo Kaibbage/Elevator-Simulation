@@ -34,13 +34,21 @@ ECS::ECS(vector<Elevator*>& elevators, vector<Floor*>& floors, vector<vector<Flo
     }
 
     tenSecondTimers = {};
-
     for(int i = 0; i < NUM_ELEVATORS; i++){
         IntegerTimer* tenSecondTimer = new IntegerTimer();
         tenSecondTimer->setElevatorNum(i);
         tenSecondTimers.push_back(tenSecondTimer);
         connect(tenSecondTimers.at(i), SIGNAL(timeoutWithInt(int)), this, SLOT(readyToGoAfterTenSeconds(int)));
     }
+
+    helpButtonTimers = {};
+    for(int i = 0; i < NUM_ELEVATORS; i++){
+        IntegerTimer* helpButtonTimer = new IntegerTimer();
+        helpButtonTimer->setElevatorNum(i);
+        helpButtonTimers.push_back(helpButtonTimer);
+        connect(helpButtonTimers.at(i), SIGNAL(timeoutWithInt(int)), this, SLOT(passengerNoTalk(int)));
+    }
+
 
 
 }
@@ -59,11 +67,13 @@ ECS::~ECS(){
     for(int i = 0; i < NUM_ELEVATORS; i++){
         delete tenSecondTimers.at(i);
     }
+    for(int i = 0; i < NUM_ELEVATORS; i++){
+        delete helpButtonTimers.at(i);
+    }
     delete building;
 }
 
 void ECS::assignToElevatorQueue(int elevatorNum, int floorNum){
-    cout << "hihi" << endl;
     floorQueues.at(elevatorNum).push(floorNum);
 }
 
@@ -104,7 +114,6 @@ void ECS::addDestinationFloorRequest(int elevatorNum, int floorNum){
 
 void ECS::updateElevatorFloor(int elevatorNum, int floorNum){
     currentElevatorFloorNumbers.at(elevatorNum) = floorNum;
-    cout << elevatorNum << " " << currentElevatorFloorNumbers.at(elevatorNum) << " " << floorQueues.at(elevatorNum).front() << endl;
 
     if(currentElevatorFloorNumbers.at(elevatorNum) == floorQueues.at(elevatorNum).front()){
         arrivedAtADesiredFloor(elevatorNum, currentElevatorFloorNumbers.at(elevatorNum));
@@ -204,13 +213,61 @@ void ECS::assignToClosestFloorEmergency(int elevatorNum){
 }
 
 void ECS::noLongerRunning(int elevatorNum){
-    emit outOfOrderSignal();
+    emit outOfOrderSignal(elevatorNum);
+
+}
+
+void ECS::fireRequestFromBuilding(){
+    for(int i = 0; i < NUM_ELEVATORS; i++){
+        elevators.at(i)->fire();
+        assignToClosestFloorEmergency(i);
+        tenSecondTimers.at(i)->disconnect();
+    }
+}
+
+void ECS::powerOutageRequest(){
+    for(int i = 0; i < NUM_ELEVATORS; i++){
+        elevators.at(i)->powerOutage();
+        assignToClosestFloorEmergency(i);
+        tenSecondTimers.at(i)->disconnect();
+    }
+}
+
+void ECS::helpButtonRequest(int elevatorNum){
+    helpButtonTimers.at(elevatorNum)->setInterval(TIME_TO_CALL_911);
+    helpButtonTimers.at(elevatorNum)->setSingleShot(true);
+    helpButtonTimers.at(elevatorNum)->start();
+    building->callBuildingSafety(elevatorNum);
+}
+void ECS::talk(int elevatorNum){
+    helpButtonTimers.at(elevatorNum)->stop();
+    building->talkToBuildingSafety(elevatorNum);
+}
+
+void ECS::passengerNoTalk(int elevatorNum){
+    building->call911(elevatorNum);
+    elevators.at(elevatorNum)->setNeedHelp(true);
 }
 void ECS::setStartingFloorValues(vector<int>& startingFloors){
     if(startingFloors.size() == currentElevatorFloorNumbers.size()){
         currentElevatorFloorNumbers = startingFloors;
     }
 
+}
+
+//for pressed
+void ECS::openButtonRequest(int elevatorNum){
+    tenSecondTimers.at(elevatorNum)->stop();
+}
+void ECS::closeButtonRequest(int elevatorNum){
+    tenSecondTimers.at(elevatorNum)->stop();
+    readyToGoAfterTenSeconds(elevatorNum);
+}
+
+void ECS::letGoOpenButtonRequest(int elevatorNum){
+    tenSecondTimers.at(elevatorNum)->setInterval(ELEVATOR_WAIT_TIME/2); //waiting for half the time
+    tenSecondTimers.at(elevatorNum)->setSingleShot(true);
+    tenSecondTimers.at(elevatorNum)->start();
 }
 
 

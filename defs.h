@@ -6,6 +6,9 @@
 
 #define ELEVATOR_WAIT_TIME 4000
 #define TIME_BETWEEN_MOVEMENT 1000
+#define TIME_TO_CALL_911 5000
+
+#define DEFAULT_VALUE -1
 
 enum class Direction {
     Up,

@@ -70,11 +70,12 @@ public:
     //HelpButton stuff
     void helpButtonRequest(int elevatorNum);
     void talk(int elevatorNum);
-    void dontTalkForFiveSeconds(int elevatorNum);
 
     //Other extras
-    void openButtonRequest(int elevatorNum, int floorNum);
-    void closeButtonRequest(int elevatorNum, int floorNum);
+    void openButtonRequest(int elevatorNum);
+    void closeButtonRequest(int elevatorNum);
+
+    void letGoOpenButtonRequest(int elevatorNum);
 
 private:
     vector<Elevator*> elevators;
@@ -89,13 +90,16 @@ private:
     vector<bool> areElevatorsReadyToMove;
 
     vector<IntegerTimer*> tenSecondTimers;
+    vector<IntegerTimer*> helpButtonTimers;
+
 
 public slots:
     void readyToGoAfterTenSeconds(int elevatorNum);
+    void passengerNoTalk(int elevatorNum);
 
 signals:
     void goBackToFloorDisplaySignal(int elevatorNum);
-    void outOfOrderSignal();
+    void outOfOrderSignal(int elevatorNum);
 };
 
 #endif

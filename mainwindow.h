@@ -22,7 +22,7 @@ public:
 
     void showFloorNum(int floorNum);
     void showElevatorNum(int elevatorNum);
-    void greyOutButtons(bool grey);
+    void greyOutButtons(int elevatorNum, bool grey);
 
 private:
     Ui::MainWindow *ui;
@@ -75,6 +75,27 @@ public slots:
 
     void elevatorFire();
 
-    void outOfOrder();
+    void outOfOrder(int elevatorNum);
+
+    void buildingFire();
+
+    void buildingPowerOutage();
+
+    void helpButtonPressed();
+    void talkButtonPressed();
+    void buildingSafetyCalled(int elevatorNum);
+    void passengerTalked(int elevatorNum);
+    void called911(int elevatorNum);
+
+    void manageIlluminationHelpButton(int, bool);
+
+    void openDoorButtonPressed();
+    void closeDoorButtonPressed();
+
+    void openDoorButtonLetGo();
+    void closeDoorButtonLetGo();
+
+    void manageIlluminationOpenButton(int, bool);
+    void manageIlluminationCloseButton(int, bool);
 };
 #endif // MAINWINDOW_H
