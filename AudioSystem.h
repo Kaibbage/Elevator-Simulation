@@ -15,12 +15,12 @@ class AudioSystem: public QObject {
     Q_OBJECT
 
 public:
-    void outputAudioMessage(string audioMessage);
+    void outputAudioMessage(int elevatorNum, string audioMessage);
 
 private:
 
 signals:
-    void outputAudioMessageSignal(string audioMessage);
+    void outputAudioMessageSignal(int elevatorNum, string audioMessage);
 
 };
 

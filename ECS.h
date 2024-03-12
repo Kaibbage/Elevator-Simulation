@@ -61,8 +61,11 @@ public:
 
     void assignToClosestFloorEmergency(int elevatorNum);
 
+    void noLongerRunning(int elevatorNum);
+
     //WeightOverload stuff
     void weightOverloadRequest(int elevatorNum);
+    void weightGoodRequest(int elevatorNum);
 
     //HelpButton stuff
     void helpButtonRequest(int elevatorNum);
@@ -72,7 +75,6 @@ public:
     //Other extras
     void openButtonRequest(int elevatorNum, int floorNum);
     void closeButtonRequest(int elevatorNum, int floorNum);
-
 
 private:
     vector<Elevator*> elevators;
@@ -86,11 +88,14 @@ private:
     vector<int> lastElementsInQueues;
     vector<bool> areElevatorsReadyToMove;
 
-    IntegerTimer tenSecondTimer;
+    vector<IntegerTimer*> tenSecondTimers;
 
 public slots:
     void readyToGoAfterTenSeconds(int elevatorNum);
 
+signals:
+    void goBackToFloorDisplaySignal(int elevatorNum);
+    void outOfOrderSignal();
 };
 
 #endif

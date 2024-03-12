@@ -1,5 +1,5 @@
 #include "AudioSystem.h"
 
-void AudioSystem::outputAudioMessage(string audioMessage){
-    emit outputAudioMessageSignal(audioMessage);
+void AudioSystem::outputAudioMessage(int elevatorNum, string audioMessage){
+    emit outputAudioMessageSignal(elevatorNum, audioMessage);
 }

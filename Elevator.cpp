@@ -19,10 +19,17 @@ Elevator::Elevator(int elevatorNum, vector<Button*>& destinationButtons, Button*
     this->weightSensor = weightSensor;
     this->lightSensor = lightSensor;
     this->ecs = ecs;
+
+    weightOverload = false;
+    lightSensorBlockedTwice = false;
+    fireTime = false;
+    powerOutTime = false;
+
+    outOfOrder = false;
 }
 
 Elevator::~Elevator(){
-    for(int i = 0; i < destinationButtons.size(); i++){
+    for(int i = 0; i < NUM_FLOORS; i++){
         delete destinationButtons.at(i);
     }
     delete openButton;
@@ -38,11 +45,17 @@ Elevator::~Elevator(){
 
 
 void Elevator::stopElevator(){
+    if(emergencyMode){
+        emergencyStop();
+    }
+
     if(destinationButtons.at(getElevatorFloorNum())->isIlluminated()){
         destinationButtons.at(getElevatorFloorNum())->turnOffLight();
     }
     bell->ringBell();
     elevatorDoor->openDoor();
+
+
 }
 
 void Elevator::startElevator(){
@@ -57,7 +70,7 @@ void Elevator::pressDestinationButton(int floorNum){
 }
 
 void Elevator::updateCurrentFloorNum(int floorNum){
-    display->displayFloor(floorNum);
+    display->displayFloor(elevatorNum, floorNum);
     ecs->updateElevatorFloor(elevatorNum, floorNum);
 
 }
@@ -70,6 +83,74 @@ void Elevator::setECS(ECS* ecs){
     this->ecs = ecs;
 }
 
+void Elevator::increaseWeight(int amount){
+    if(currentWeight + amount > 0){
+        currentWeight += amount;
+    }
+    else{
+        currentWeight = 0;
+    }
+
+    if(weightSensor->checkWeightSensorOverload(currentWeight)){
+        ecs->weightOverloadRequest(elevatorNum);
+        weightOverload = true;
+    }
+
+}
+void Elevator::decreaseWeight(int amount){
+    if(currentWeight - amount > 0){
+        currentWeight -= amount;
+    }
+    else{
+        currentWeight = 0;
+    }
+
+    if(!weightSensor->checkWeightSensorOverload(currentWeight)){
+        ecs->weightGoodRequest(elevatorNum);
+        weightOverload = false;
+    }
+}
+void Elevator::stopElevatorForWeight(){
+    display->displayMessage(elevatorNum, "Weight limit exceeded, please lower weight");
+    audioSystem->outputAudioMessage(elevatorNum, "Weight limit exceeded, please lower weight");
+
+}
+
+void Elevator::blockLightSensor(){
+    if(!lightSensor->hasLightSensorBeenBlockedBefore()){
+        lightSensor->blockLightSensor();
+        ecs->blockedDoorOnceRequest(elevatorNum);
+    }
+    else{
+        lightSensorBlockedTwice = true;
+        ecs->blockedDoorMultipleRequest(elevatorNum);
+    }
+
+}
+
+void Elevator::unblockLightSensor(){
+    lightSensor->unblockLightSensor();
+    lightSensorBlockedTwice = false;
+}
+
+void Elevator::stopElevatorForBlockedMoreThanOnce(){
+    display->displayMessage(elevatorNum, "Stop blocking the door");
+    audioSystem->outputAudioMessage(elevatorNum, "Stop blocking the door");
+}
+
+void Elevator::fire(){
+    display->displayMessage(elevatorNum, "There is a fire in this elevator, please exit when the doors open at the next floor");
+    audioSystem->outputAudioMessage(elevatorNum, "There is a fire in this elevator, please exit when the doors open at the next floor");
+    emergencyMode = true;
+    fireTime = true;
+}
+
+void Elevator::emergencyStop(){
+    display->displayMessage(elevatorNum, "Please exit immediately");
+    audioSystem->outputAudioMessage(elevatorNum, "Please exit immediately");
+    outOfOrder = true;
+    ecs->noLongerRunning(elevatorNum);
+}
 
 vector<Button*> Elevator::getDestinationButtons(){
     return destinationButtons;
@@ -103,4 +184,40 @@ LightSensor* Elevator::getLightSensor(){
 }
 int Elevator::getElevatorNum(){
     return elevatorNum;
+}
+
+int Elevator::getCurrentWeight(){
+    return currentWeight;
+}
+
+bool Elevator::getWeightOverload(){
+    return weightOverload;
+}
+bool Elevator::getLightSensorBlockedTwice(){
+    return lightSensorBlockedTwice;
+}
+bool Elevator::getFireTime(){
+    return fireTime;
+}
+bool Elevator::getPowerOutTime(){
+    return powerOutTime;
+}
+
+void Elevator::setWeightOverload(bool i){
+    weightOverload = i;
+}
+void Elevator::setLightSensorBlockedTwice(bool i){
+    lightSensorBlockedTwice = i;
+}
+void Elevator::setFireTime(bool i){
+    fireTime = i;
+}
+void Elevator::setPowerOutTime(bool i){
+    powerOutTime = i;
+}
+bool Elevator::getOutOfOrder(){
+    return outOfOrder;
+}
+void Elevator::setOutOfOrder(bool outOfOrder){
+    this->outOfOrder = outOfOrder;
 }

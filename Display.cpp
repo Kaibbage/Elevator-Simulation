@@ -3,10 +3,10 @@
 Display::Display(){
 
 }
-void Display::displayFloor(int floorNum){
-    emit displayFloorSignal(floorNum);
+void Display::displayFloor(int elevatorNum, int floorNum){
+    emit displayFloorSignal(elevatorNum, floorNum);
 }
 
-void Display::displayMessage(string message){
-    emit displayMessageSignal(message);
+void Display::displayMessage(int elevatorNum, string message){
+    emit displayMessageSignal(elevatorNum, message);
 }

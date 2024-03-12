@@ -16,14 +16,14 @@ class Display: public QObject {
 
 public:
     Display();
-    void displayMessage(string message);
-    void displayFloor(int floorNum);
+    void displayMessage(int elevatorNum, string message);
+    void displayFloor(int elevatorNum, int floorNum);
 
 private:
 
 signals:
-    void displayMessageSignal(string message);
-    void displayFloorSignal(int floorNum);
+    void displayMessageSignal(int elevatorNum, string message);
+    void displayFloorSignal(int elevatorNum, int floorNum);
 
 };
 

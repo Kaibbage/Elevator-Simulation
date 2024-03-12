@@ -9,43 +9,55 @@ ECS::ECS(vector<Elevator*>& elevators, vector<Floor*>& floors, vector<vector<Flo
 
 
     floorQueues = {};
-    for(int i = 0; i < elevators.size(); i++){
+    for(int i = 0; i < NUM_ELEVATORS; i++){
         floorQueues.push_back({});
     }
 
     currentElevatorFloorNumbers = {};
-    for(int i = 0; i < elevators.size(); i++){
+    for(int i = 0; i < NUM_ELEVATORS; i++){
         currentElevatorFloorNumbers.push_back(0);
     }
 
     elevatorDirectionValues ={};
-    for(int i = 0; i < elevators.size(); i++){
+    for(int i = 0; i < NUM_ELEVATORS; i++){
         elevatorDirectionValues.push_back(Direction::Neutral);
     }
 
     lastElementsInQueues ={};
-    for(int i = 0; i < elevators.size(); i++){
+    for(int i = 0; i < NUM_ELEVATORS; i++){
         lastElementsInQueues.push_back(0);
     }
 
     areElevatorsReadyToMove ={};
-    for(int i = 0; i < elevators.size(); i++){
+    for(int i = 0; i < NUM_ELEVATORS; i++){
         areElevatorsReadyToMove.push_back(false);
     }
 
-    connect(&tenSecondTimer, SIGNAL(timeoutWithInt(int)), this, SLOT(readyToGoAfterTenSeconds(int)));
+    tenSecondTimers = {};
+
+    for(int i = 0; i < NUM_ELEVATORS; i++){
+        IntegerTimer* tenSecondTimer = new IntegerTimer();
+        tenSecondTimer->setElevatorNum(i);
+        tenSecondTimers.push_back(tenSecondTimer);
+        connect(tenSecondTimers.at(i), SIGNAL(timeoutWithInt(int)), this, SLOT(readyToGoAfterTenSeconds(int)));
+    }
+
+
 }
 ECS::~ECS(){
-    for(int i = 0; i < elevators.size(); i++){
+    for(int i = 0; i < NUM_ELEVATORS; i++){
         delete elevators.at(i);
     }
-    for(int i = 0; i < floors.size(); i++){
+    for(int i = 0; i < NUM_FLOORS; i++){
         delete floors.at(i);
     }
-    for(int i = 0; i < allSetsOfFloorSensors.size(); i++){
-        for(int j = 0; j < allSetsOfFloorSensors.at(i).size(); j++){
+    for(int i = 0; i < NUM_ELEVATORS; i++){
+        for(int j = 0; j < NUM_FLOORS; j++){
             delete allSetsOfFloorSensors.at(i).at(j);
         }
+    }
+    for(int i = 0; i < NUM_ELEVATORS; i++){
+        delete tenSecondTimers.at(i);
     }
     delete building;
 }
@@ -56,15 +68,14 @@ void ECS::assignToElevatorQueue(int elevatorNum, int floorNum){
 }
 
 void ECS::addStartingFloorRequest(int floorNum){
-    int closest = floors.size();
+    int closest = NUM_FLOORS;
 
     int chosenElevatorNum = 0;
 
     bool prio1 = false;
-    //bool needDisplay = false;
 
-    //This logic isn't perfect, need to fix
-    for(int i = 0; i < elevators.size(); i++){
+    //perfecto
+    for(int i = 0; i < NUM_ELEVATORS; i++){
         if(floorQueues.at(i).size() == 0 && (abs(currentElevatorFloorNumbers.at(i) - floorNum) < closest || prio1 == false)){
             chosenElevatorNum = i;
             closest = abs(currentElevatorFloorNumbers.at(i) - floorNum);
@@ -85,7 +96,7 @@ void ECS::addStartingFloorRequest(int floorNum){
 
 void ECS::addDestinationFloorRequest(int elevatorNum, int floorNum){
     assignToElevatorQueue(elevatorNum, floorNum);
-    if(floorQueues.at(elevatorNum).size() == 1){
+    if(floorQueues.at(elevatorNum).size() == 1 && !elevators.at(elevatorNum)->getElevatorDoor()->isDoorOpen()){
         areElevatorsReadyToMove.at(elevatorNum) = true;
     }
 }
@@ -102,7 +113,7 @@ void ECS::updateElevatorFloor(int elevatorNum, int floorNum){
 
 
 void ECS::moveElevatorsTowardsDestination(){
-    for(int i = 0; i < elevators.size(); i++){
+    for(int i = 0; i < NUM_ELEVATORS; i++){
         if(areElevatorsReadyToMove.at(i) && floorQueues.at(i).size() > 0){
             if(currentElevatorFloorNumbers.at(i) < floorQueues.at(i).front()){
                 allSetsOfFloorSensors.at(i).at(currentElevatorFloorNumbers.at(i)+1)->detected();
@@ -126,6 +137,7 @@ int ECS::getElevatorFloorNum(int elevatorNum){
 
 
 void ECS::readyToGoAfterTenSeconds(int elevatorNum){
+    unblockedDoorRequest(elevatorNum);
     elevators.at(elevatorNum)->startElevator();
     floors.at(currentElevatorFloorNumbers.at(elevatorNum))->leaving();
 
@@ -133,11 +145,9 @@ void ECS::readyToGoAfterTenSeconds(int elevatorNum){
 }
 
 void ECS::arrivedAtADesiredFloor(int elevatorNum, int floorNum){
-    tenSecondTimer.setElevatorNum(elevatorNum);
-    tenSecondTimer.setInterval(3000); //only 3 seconds for now
-    tenSecondTimer.setSingleShot(true);
-    tenSecondTimer.start();
-
+    tenSecondTimers.at(elevatorNum)->setInterval(ELEVATOR_WAIT_TIME); //only 3 seconds for now
+    tenSecondTimers.at(elevatorNum)->setSingleShot(true);
+    tenSecondTimers.at(elevatorNum)->start();
     floorQueues.at(elevatorNum).pop();
     areElevatorsReadyToMove.at(elevatorNum) = false;
 
@@ -148,6 +158,54 @@ void ECS::arrivedAtADesiredFloor(int elevatorNum, int floorNum){
 }
 
 
+void ECS::weightOverloadRequest(int elevatorNum){
+    elevators.at(elevatorNum)->stopElevatorForWeight();
+    tenSecondTimers.at(elevatorNum)->stop();
+}
+
+void ECS::weightGoodRequest(int elevatorNum){
+    tenSecondTimers.at(elevatorNum)->setInterval(ELEVATOR_WAIT_TIME/5); //waiting for a little bit
+    tenSecondTimers.at(elevatorNum)->setSingleShot(true);
+    tenSecondTimers.at(elevatorNum)->start();
+
+    emit goBackToFloorDisplaySignal(elevatorNum);
+}
+
+
+void ECS::blockedDoorOnceRequest(int elevatorNum){
+    tenSecondTimers.at(elevatorNum)->stop();
+    tenSecondTimers.at(elevatorNum)->setInterval(ELEVATOR_WAIT_TIME); //waiting for a little bit
+    tenSecondTimers.at(elevatorNum)->setSingleShot(true);
+    tenSecondTimers.at(elevatorNum)->start();
+}
+
+void ECS::blockedDoorMultipleRequest(int elevatorNum){
+    blockedDoorOnceRequest(elevatorNum);
+    elevators.at(elevatorNum)->stopElevatorForBlockedMoreThanOnce();
+
+}
+void ECS::unblockedDoorRequest(int elevatorNum){
+    elevators.at(elevatorNum)->unblockLightSensor();
+    emit goBackToFloorDisplaySignal(elevatorNum);
+}
+
+void ECS::fireRequestFromElevator(int elevatorNum){
+    elevators.at(elevatorNum)->fire();
+    assignToClosestFloorEmergency(elevatorNum);
+    tenSecondTimers.at(elevatorNum)->disconnect();
+}
+
+void ECS::assignToClosestFloorEmergency(int elevatorNum){
+    while(!floorQueues.at(elevatorNum).empty()){
+        floorQueues.at(elevatorNum).pop();
+    }
+    floorQueues.at(elevatorNum).push(getElevatorFloorNum(elevatorNum));
+    areElevatorsReadyToMove.at(elevatorNum) = true;
+}
+
+void ECS::noLongerRunning(int elevatorNum){
+    emit outOfOrderSignal();
+}
 void ECS::setStartingFloorValues(vector<int>& startingFloors){
     if(startingFloors.size() == currentElevatorFloorNumbers.size()){
         currentElevatorFloorNumbers = startingFloors;

@@ -44,7 +44,6 @@ public:
     //light stuff
     void blockLightSensor();
     void unblockLightSensor();
-    void stopElevatorForBlockedDoorOnce();
     void stopElevatorForBlockedMoreThanOnce();
 
     //fire stuff
@@ -77,6 +76,20 @@ public:
     AudioSystem* getAudioSystem();
     WeightSensor* getWeightSensor();
     LightSensor* getLightSensor();
+    int getCurrentWeight();
+
+    bool getWeightOverload();
+    bool getLightSensorBlockedTwice();
+    bool getFireTime();
+    bool getPowerOutTime();
+
+    void setWeightOverload(bool);
+    void setLightSensorBlockedTwice(bool);
+    void setFireTime(bool);
+    void setPowerOutTime(bool);
+
+    bool getOutOfOrder();
+    void setOutOfOrder(bool);
 
 
 private:
@@ -95,6 +108,14 @@ private:
     WeightSensor* weightSensor;
     LightSensor* lightSensor;
     ECS *ecs;
+
+    bool weightOverload;
+    bool lightSensorBlockedTwice;
+    bool fireTime;
+    bool powerOutTime;
+
+    bool outOfOrder;
+
 
 
 };

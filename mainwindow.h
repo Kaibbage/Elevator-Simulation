@@ -41,10 +41,10 @@ public slots:
     void ringBellGUI();
     void clearBellGUI();
 
-    void displayFloorGUI(int);
-    void displayMessageGUI(string);
+    void displayFloorGUI(int, int);
+    void displayMessageGUI(int, string);
 
-    void outputAudioMessageGUI(string);
+    void outputAudioMessageGUI(int, string);
 
     void clickUpButton();
     void clickDownButton();
@@ -64,5 +64,16 @@ public slots:
 
     void manageElevatorDoor(int, bool);
     void manageFloorDoor(int, bool);
+
+    void addWeightSlot();
+    void removeWeightSlot();
+
+    void goBackToFloorDisplay(int elevatorNum);
+
+    void blockDoor();
+
+    void elevatorFire();
+
+    void outOfOrder();
 };
 #endif // MAINWINDOW_H
