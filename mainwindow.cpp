@@ -347,51 +347,13 @@ void MainWindow::changeElevator(){
     }
 
     if(!ecs->getElevators().at(currentElevatorNum)->getOutOfOrder()){
-        for(int i = 0; i < NUM_FLOORS; i++){
-            qDestButtons.at(i)->setDisabled(false);
-            qDestButtons.at(i)->setStyleSheet("background-color: white;");
-        }
-
-        ui->blockDoorButton->setDisabled(false);
-        ui->addWeightButton->setDisabled(false);
-        ui->removeWeightButton->setDisabled(false);
-        ui->helpButton->setDisabled(false);
-        ui->fireButton->setDisabled(false);
-        ui->openDoorButton->setDisabled(false);
-        ui->closeDoorButton->setDisabled(false);
-
-        ui->blockDoorButton->setStyleSheet("background-color: white;");
-        ui->addWeightButton->setStyleSheet("background-color: white;");
-        ui->removeWeightButton->setStyleSheet("background-color: white;");
-        ui->helpButton->setStyleSheet("background-color: white;");
-        ui->fireButton->setStyleSheet("background-color: white;");
-        ui->openDoorButton->setStyleSheet("background-color: white;");
-        ui->closeDoorButton->setStyleSheet("background-color: white;");
+        greyOutButtons(false);
+    }
+    else{
+        greyOutButtons(true);
 
         displayMessageGUI(currentElevatorNum, "Please exit immediately");
         outputAudioMessageGUI(currentElevatorNum, "Please exit immediately");
-    }
-    else{
-        for(int i = 0; i < NUM_FLOORS; i++){
-            qDestButtons.at(i)->setDisabled(true);
-            qDestButtons.at(i)->setStyleSheet("background-color: gray;");
-        }
-
-        ui->blockDoorButton->setDisabled(true);
-        ui->addWeightButton->setDisabled(true);
-        ui->removeWeightButton->setDisabled(true);
-        ui->helpButton->setDisabled(true);
-        ui->fireButton->setDisabled(true);
-        ui->openDoorButton->setDisabled(true);
-        ui->closeDoorButton->setDisabled(true);
-
-        ui->blockDoorButton->setStyleSheet("background-color: gray;");
-        ui->addWeightButton->setStyleSheet("background-color: gray;");
-        ui->removeWeightButton->setStyleSheet("background-color: gray;");
-        ui->helpButton->setStyleSheet("background-color: gray;");
-        ui->fireButton->setStyleSheet("background-color: gray;");
-        ui->openDoorButton->setStyleSheet("background-color: gray;");
-        ui->closeDoorButton->setStyleSheet("background-color: gray;");
     }
 
 
@@ -512,25 +474,56 @@ void MainWindow::elevatorFire(){
 }
 
 void MainWindow::outOfOrder(){
-    for(int i = 0; i < NUM_FLOORS; i++){
-        qDestButtons.at(i)->setDisabled(true);
-        qDestButtons.at(i)->setStyleSheet("background-color: gray;");
+    greyOutButtons(true);
+
+}
+
+void MainWindow::greyOutButtons(bool grey){
+    if(!grey){
+        for(int i = 0; i < NUM_FLOORS; i++){
+            qDestButtons.at(i)->setDisabled(false);
+            qDestButtons.at(i)->setStyleSheet("background-color: white;");
+        }
+
+        ui->blockDoorButton->setDisabled(false);
+        ui->addWeightButton->setDisabled(false);
+        ui->removeWeightButton->setDisabled(false);
+        ui->helpButton->setDisabled(false);
+        ui->fireButton->setDisabled(false);
+        ui->openDoorButton->setDisabled(false);
+        ui->closeDoorButton->setDisabled(false);
+
+        ui->blockDoorButton->setStyleSheet("background-color: white;");
+        ui->addWeightButton->setStyleSheet("background-color: white;");
+        ui->removeWeightButton->setStyleSheet("background-color: white;");
+        ui->helpButton->setStyleSheet("background-color: white;");
+        ui->fireButton->setStyleSheet("background-color: white;");
+        ui->openDoorButton->setStyleSheet("background-color: white;");
+        ui->closeDoorButton->setStyleSheet("background-color: white;");
+
+
     }
+    else{
+        for(int i = 0; i < NUM_FLOORS; i++){
+            qDestButtons.at(i)->setDisabled(true);
+            qDestButtons.at(i)->setStyleSheet("background-color: gray;");
+        }
 
-    ui->blockDoorButton->setDisabled(true);
-    ui->addWeightButton->setDisabled(true);
-    ui->removeWeightButton->setDisabled(true);
-    ui->helpButton->setDisabled(true);
-    ui->fireButton->setDisabled(true);
-    ui->openDoorButton->setDisabled(true);
-    ui->closeDoorButton->setDisabled(true);
+        ui->blockDoorButton->setDisabled(true);
+        ui->addWeightButton->setDisabled(true);
+        ui->removeWeightButton->setDisabled(true);
+        ui->helpButton->setDisabled(true);
+        ui->fireButton->setDisabled(true);
+        ui->openDoorButton->setDisabled(true);
+        ui->closeDoorButton->setDisabled(true);
 
-    ui->blockDoorButton->setStyleSheet("background-color: gray;");
-    ui->addWeightButton->setStyleSheet("background-color: gray;");
-    ui->removeWeightButton->setStyleSheet("background-color: gray;");
-    ui->helpButton->setStyleSheet("background-color: gray;");
-    ui->fireButton->setStyleSheet("background-color: gray;");
-    ui->openDoorButton->setStyleSheet("background-color: gray;");
-    ui->closeDoorButton->setStyleSheet("background-color: gray;");
+        ui->blockDoorButton->setStyleSheet("background-color: gray;");
+        ui->addWeightButton->setStyleSheet("background-color: gray;");
+        ui->removeWeightButton->setStyleSheet("background-color: gray;");
+        ui->helpButton->setStyleSheet("background-color: gray;");
+        ui->fireButton->setStyleSheet("background-color: gray;");
+        ui->openDoorButton->setStyleSheet("background-color: gray;");
+        ui->closeDoorButton->setStyleSheet("background-color: gray;");
 
+    }
 }

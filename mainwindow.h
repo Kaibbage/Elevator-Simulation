@@ -22,6 +22,7 @@ public:
 
     void showFloorNum(int floorNum);
     void showElevatorNum(int elevatorNum);
+    void greyOutButtons(bool grey);
 
 private:
     Ui::MainWindow *ui;
