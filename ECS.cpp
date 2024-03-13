@@ -146,7 +146,6 @@ int ECS::getElevatorFloorNum(int elevatorNum){
 
 
 void ECS::readyToGoAfterTenSeconds(int elevatorNum){
-    unblockedDoorRequest(elevatorNum);
     elevators.at(elevatorNum)->startElevator();
     floors.at(currentElevatorFloorNumbers.at(elevatorNum))->leaving();
 

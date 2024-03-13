@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1116</width>
+    <width>1265</width>
     <height>688</height>
    </rect>
   </property>
@@ -171,7 +171,7 @@
    <widget class="QLabel" name="label_4">
     <property name="geometry">
      <rect>
-      <x>960</x>
+      <x>1040</x>
       <y>470</y>
       <width>62</width>
       <height>17</height>
@@ -401,7 +401,7 @@
      <rect>
       <x>870</x>
       <y>450</y>
-      <width>241</width>
+      <width>391</width>
       <height>16</height>
      </rect>
     </property>
@@ -479,7 +479,7 @@
      <rect>
       <x>880</x>
       <y>490</y>
-      <width>211</width>
+      <width>361</width>
       <height>141</height>
      </rect>
     </property>
@@ -497,13 +497,26 @@
      <string>Talk</string>
     </property>
    </widget>
+   <widget class="Line" name="line_5">
+    <property name="geometry">
+     <rect>
+      <x>1090</x>
+      <y>-290</y>
+      <width>51</width>
+      <height>751</height>
+     </rect>
+    </property>
+    <property name="orientation">
+     <enum>Qt::Vertical</enum>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1116</width>
+     <width>1265</width>
      <height>22</height>
     </rect>
    </property>

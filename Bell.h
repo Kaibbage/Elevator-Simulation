@@ -4,6 +4,8 @@
 #ifndef BELL_H
 #define BELL_H
 
+#include "defs.h"
+
 using namespace std;
 
 /*
@@ -16,14 +18,13 @@ class Bell: public QObject {
     Q_OBJECT
 
 public:
-    Bell(string = "ding ding!");
+    Bell(int = DEFAULT_VALUE);
     void ringBell();
 
 private:
-    string bellMessage;
-
+    int elevatorNum;
 signals:
-    void ringBellSignal();
+    void ringBellSignal(int);
 
 };
 

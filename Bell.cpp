@@ -1,9 +1,9 @@
 #include "Bell.h"
 
-Bell::Bell(string bellMsg){
-    bellMessage = bellMsg;
+Bell::Bell(int elevatorNum){
+    this->elevatorNum = elevatorNum;
 }
 
 void Bell::ringBell(){
-    emit ringBellSignal();
+    emit ringBellSignal(elevatorNum);
 }

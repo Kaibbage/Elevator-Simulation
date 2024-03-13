@@ -39,7 +39,7 @@ private:
     vector<QLabel*> floorLabels;
 
 public slots:
-    void ringBellGUI();
+    void ringBellGUI(int);
     void clearBellGUI();
 
     void displayFloorGUI(int, int);
@@ -59,9 +59,9 @@ public slots:
 
     void floorSensorArrivedDisplay(int elevatorNum, int floorNum);
 
-    void manageIlluminationDestinationButton(int, bool);
-    void manageIlluminationUpButton(int, bool);
-    void manageIlluminationDownButton(int, bool);
+    void manageIlluminationDestinationButton(int, int, bool);
+    void manageIlluminationUpButton(int, int, bool);
+    void manageIlluminationDownButton(int, int, bool);
 
     void manageElevatorDoor(int, bool);
     void manageFloorDoor(int, bool);
@@ -87,7 +87,7 @@ public slots:
     void passengerTalked(int elevatorNum);
     void called911(int elevatorNum);
 
-    void manageIlluminationHelpButton(int, bool);
+    void manageIlluminationHelpButton(int, int, bool);
 
     void openDoorButtonPressed();
     void closeDoorButtonPressed();
@@ -95,7 +95,7 @@ public slots:
     void openDoorButtonLetGo();
     void closeDoorButtonLetGo();
 
-    void manageIlluminationOpenButton(int, bool);
-    void manageIlluminationCloseButton(int, bool);
+    void manageIlluminationOpenButton(int, int, bool);
+    void manageIlluminationCloseButton(int, int, bool);
 };
 #endif // MAINWINDOW_H
