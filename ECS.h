@@ -33,7 +33,7 @@ public:
     ~ECS();
 
     void assignToElevatorQueue(int elevatorNum, int floorNum);
-    void addStartingFloorRequest(int floorNum);
+    void addStartingFloorRequest(int floorNum, Direction direction);
     void addDestinationFloorRequest(int elevatorNum, int floorNum);
     void updateElevatorFloor(int elevatorNum, int floorNum);
     void moveElevatorsTowardsDestination();
@@ -91,6 +91,7 @@ private:
 
     vector<IntegerTimer*> tenSecondTimers;
     vector<IntegerTimer*> helpButtonTimers;
+
 
 
 public slots:

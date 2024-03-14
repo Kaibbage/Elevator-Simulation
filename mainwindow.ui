@@ -165,7 +165,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>AudioSystem</string>
+     <string>Audio System</string>
     </property>
    </widget>
    <widget class="QLabel" name="label_4">

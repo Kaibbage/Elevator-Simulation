@@ -26,8 +26,8 @@ MainWindow::MainWindow(QWidget *parent)
         Button* helpButton = new Button(i, DEFAULT_VALUE);
         Bell* bell = new Bell(i);
         Door* eDoor = new Door(i);
-        Display* display = new Display();
-        AudioSystem* audioSystem = new AudioSystem();
+        Display* display = new Display(i);
+        AudioSystem* audioSystem = new AudioSystem(i);
         WeightSensor* weightSensor = new WeightSensor();
         LightSensor* lightSensor = new LightSensor();
 
@@ -163,6 +163,19 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ecs->getElevators().front()->getOpenButton(), SIGNAL(isIlluminatedSignal(int, int, bool)), this, SLOT(manageIlluminationOpenButton(int, int, bool)));
     connect(ecs->getElevators().front()->getCloseButton(), SIGNAL(isIlluminatedSignal(int, int, bool)), this, SLOT(manageIlluminationCloseButton(int, int, bool)));
 
+    //Connecting certain things to all elevators that might be necessary in some emergency case
+    for(int i = 1; i < NUM_ELEVATORS; i++){
+        connect(ecs->getElevators().at(i)->getBell(), SIGNAL(ringBellSignal(int)), this, SLOT(ringBellGUI(int)));
+
+        connect(ecs->getElevators().at(i)->getDisplay(), SIGNAL(displayFloorSignal(int, int)), this, SLOT(displayFloorGUI(int, int)));
+        connect(ecs->getElevators().at(i)->getDisplay(), SIGNAL(displayMessageSignal(int, string)), this, SLOT(displayMessageGUI(int, string)));
+
+        connect(ecs->getElevators().at(i)->getAudioSystem(), SIGNAL(outputAudioMessageSignal(int, string)), this, SLOT(outputAudioMessageGUI(int, string)));
+    }
+
+
+
+
 
     //floors
     connect(ecs->getFloors().front()->getUpButton(), SIGNAL(isIlluminatedSignal(int, int, bool)), this, SLOT(manageIlluminationUpButton(int, int, bool)));
@@ -240,6 +253,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->talkButton->setDisabled(true);
     ui->openDoorButton->setDisabled(true);
     ui->closeDoorButton->setDisabled(true);
+    ui->downButton->setDisabled(true);
 
 
 
@@ -357,6 +371,20 @@ void MainWindow::changeFloor(){
     }
     if(ecs->getFloors().at(currentFloorNum)->getDownButton()->isIlluminated()){
         ui->downButton->setStyleSheet("background-color: yellow;");
+    }
+
+    //Deciding if user can use up or down buttons based on floor number
+    if(currentFloorNum == 0){
+        ui->upButton->setDisabled(false);
+        ui->downButton->setDisabled(true);
+    }
+    else if(currentFloorNum == NUM_FLOORS-1){
+        ui->upButton->setDisabled(true);
+        ui->downButton->setDisabled(false);
+    }
+    else{
+        ui->upButton->setDisabled(false);
+        ui->downButton->setDisabled(false);
     }
 }
 
@@ -571,7 +599,7 @@ void MainWindow::manageElevatorDoor(int elevatorNum, bool open){
 void MainWindow::manageFloorDoor(int floorNum, bool open){
     if(open == true){
         floorDoorLayout.at(floorNum)->setStyleSheet("background-color: green;");
-        ui->console->append("door for Floor " + QString::number(floorNum+1) + " has closed");
+        ui->console->append("door for Floor " + QString::number(floorNum+1) + " has opened");
     }
     else{
         floorDoorLayout.at(floorNum)->setStyleSheet("background-color: red;");

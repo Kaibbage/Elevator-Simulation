@@ -23,9 +23,11 @@ accessed as a pointer as it is a huge object and multiple classes may need to ac
 */
 class Elevator {
 public:
+    //constructor/destructor
     Elevator(int elevatorNum, vector<Button*>& destinationButtons, Button* openButton, Button* closeButton, Button* helpButton, Bell* bell, Door* elevatorDoor, Display* display, AudioSystem* audioSystem, WeightSensor* weightSensor, LightSensor* lightSensor, ECS* ecs);
     ~Elevator();
 
+    //basic stuff
     void stopElevator();
     void startElevator();
     void pressDestinationButton(int floorNum);

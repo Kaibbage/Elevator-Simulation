@@ -3,6 +3,7 @@
 
 #ifndef DISPLAY_H
 #define DISPLAY_H
+#include "defs.h"
 
 using namespace std;
 
@@ -15,11 +16,12 @@ class Display: public QObject {
     Q_OBJECT
 
 public:
-    Display();
-    void displayMessage(int elevatorNum, string message);
-    void displayFloor(int elevatorNum, int floorNum);
+    Display(int = DEFAULT_VALUE);
+    void displayMessage(string message);
+    void displayFloor(int floorNum);
 
 private:
+    int elevatorNum;
 
 signals:
     void displayMessageSignal(int elevatorNum, string message);

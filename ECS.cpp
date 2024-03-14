@@ -75,9 +75,10 @@ ECS::~ECS(){
 
 void ECS::assignToElevatorQueue(int elevatorNum, int floorNum){
     floorQueues.at(elevatorNum).push(floorNum);
+    lastElementsInQueues.at(elevatorNum) = floorNum;
 }
 
-void ECS::addStartingFloorRequest(int floorNum){
+void ECS::addStartingFloorRequest(int floorNum, Direction direction){
     int closest = NUM_FLOORS;
 
     int chosenElevatorNum = 0;
@@ -86,11 +87,13 @@ void ECS::addStartingFloorRequest(int floorNum){
 
     //perfecto
     for(int i = 0; i < NUM_ELEVATORS; i++){
+        //scenario where at least 1 elevator is empty
         if(floorQueues.at(i).size() == 0 && (abs(currentElevatorFloorNumbers.at(i) - floorNum) < closest || prio1 == false)){
             chosenElevatorNum = i;
             closest = abs(currentElevatorFloorNumbers.at(i) - floorNum);
             prio1 = true;
         }
+        //scenario where all elevators are full
         else if(prio1 == false && abs(lastElementsInQueues.at(i) - floorNum) < closest){
             chosenElevatorNum = i;
             closest = abs(lastElementsInQueues.at(i) - floorNum);
@@ -98,6 +101,7 @@ void ECS::addStartingFloorRequest(int floorNum){
     }
 
     assignToElevatorQueue(chosenElevatorNum, floorNum);
+    elevatorDirectionValues.at(chosenElevatorNum) = direction;
     if(floorQueues.at(chosenElevatorNum).size() == 1){
         areElevatorsReadyToMove.at(chosenElevatorNum) = true;
     }
@@ -108,6 +112,13 @@ void ECS::addDestinationFloorRequest(int elevatorNum, int floorNum){
     assignToElevatorQueue(elevatorNum, floorNum);
     if(floorQueues.at(elevatorNum).size() == 1 && !elevators.at(elevatorNum)->getElevatorDoor()->isDoorOpen()){
         areElevatorsReadyToMove.at(elevatorNum) = true;
+    }
+
+    if(getElevatorFloorNum(elevatorNum) < floorNum){
+        elevatorDirectionValues.at(elevatorNum) = Direction::Up;
+    }
+    else if(getElevatorFloorNum(elevatorNum) > floorNum){
+        elevatorDirectionValues.at(elevatorNum) = Direction::Down;
     }
 }
 
@@ -207,7 +218,7 @@ void ECS::assignToClosestFloorEmergency(int elevatorNum){
     while(!floorQueues.at(elevatorNum).empty()){
         floorQueues.at(elevatorNum).pop();
     }
-    floorQueues.at(elevatorNum).push(getElevatorFloorNum(elevatorNum));
+    assignToElevatorQueue(elevatorNum, getElevatorFloorNum(elevatorNum));
     areElevatorsReadyToMove.at(elevatorNum) = true;
 }
 

@@ -72,7 +72,7 @@ void Elevator::pressDestinationButton(int floorNum){
 }
 
 void Elevator::updateCurrentFloorNum(int floorNum){
-    display->displayFloor(elevatorNum, floorNum);
+    display->displayFloor(floorNum);
     ecs->updateElevatorFloor(elevatorNum, floorNum);
 
 }
@@ -113,8 +113,8 @@ void Elevator::decreaseWeight(int amount){
     }
 }
 void Elevator::stopElevatorForWeight(){
-    display->displayMessage(elevatorNum, "Weight limit exceeded, please lower weight");
-    audioSystem->outputAudioMessage(elevatorNum, "Weight limit exceeded, please lower weight");
+    display->displayMessage("Weight limit exceeded, please lower weight");
+    audioSystem->outputAudioMessage("Weight limit exceeded, please lower weight");
 
 }
 
@@ -136,20 +136,20 @@ void Elevator::unblockLightSensor(){
 }
 
 void Elevator::stopElevatorForBlockedMoreThanOnce(){
-    display->displayMessage(elevatorNum, "Stop blocking the door");
-    audioSystem->outputAudioMessage(elevatorNum, "Stop blocking the door");
+    display->displayMessage("Stop blocking the door");
+    audioSystem->outputAudioMessage("Stop blocking the door");
 }
 
 void Elevator::fire(){
-    display->displayMessage(elevatorNum, "There is a fire in this elevator, please exit when the doors open at the next floor");
-    audioSystem->outputAudioMessage(elevatorNum, "There is a fire in this elevator, please exit when the doors open at the next floor");
+    display->displayMessage("There is a fire in this elevator, please exit when the doors open at the next floor");
+    audioSystem->outputAudioMessage("There is a fire in this elevator, please exit when the doors open at the next floor");
     emergencyMode = true;
     fireTime = true;
 }
 
 void Elevator::emergencyStop(){
-    display->displayMessage(elevatorNum, "Please exit immediately");
-    audioSystem->outputAudioMessage(elevatorNum, "Please exit immediately");
+    display->displayMessage("Please exit immediately");
+    audioSystem->outputAudioMessage("Please exit immediately");
     outOfOrder = true;
     ecs->noLongerRunning(elevatorNum);
     fireTime = false;
@@ -157,8 +157,8 @@ void Elevator::emergencyStop(){
 }
 
 void Elevator::powerOutage(){
-    display->displayMessage(elevatorNum, "This elevator is out of power, please exit when the doors open at the next floor");
-    audioSystem->outputAudioMessage(elevatorNum, "This elevator is out of power, please exit when the doors open at the next floor");
+    display->displayMessage("This elevator is out of power, please exit when the doors open at the next floor");
+    audioSystem->outputAudioMessage("This elevator is out of power, please exit when the doors open at the next floor");
     emergencyMode = true;
     powerOutTime = true;
 }

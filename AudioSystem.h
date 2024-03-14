@@ -3,6 +3,7 @@
 
 #ifndef AUDIOSYSTEM_H
 #define AUDIOSYSTEM_H
+#include "defs.h"
 
 using namespace std;
 
@@ -15,9 +16,11 @@ class AudioSystem: public QObject {
     Q_OBJECT
 
 public:
-    void outputAudioMessage(int elevatorNum, string audioMessage);
+    AudioSystem(int = DEFAULT_VALUE);
+    void outputAudioMessage(string audioMessage);
 
 private:
+    int elevatorNum;
 
 signals:
     void outputAudioMessageSignal(int elevatorNum, string audioMessage);

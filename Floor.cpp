@@ -17,12 +17,12 @@ Floor::~Floor(){
 
 void Floor::pressUpButton(){
     upButton->illuminate();
-    ecs->addStartingFloorRequest(floorNum);
+    ecs->addStartingFloorRequest(floorNum, Direction::Up);
 }
 
 void Floor::pressDownButton(){
     downButton->illuminate();
-    ecs->addStartingFloorRequest(floorNum);
+    ecs->addStartingFloorRequest(floorNum, Direction::Down);
 }
 
 void Floor::arrived(){

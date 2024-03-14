@@ -16,13 +16,5 @@ enum class Direction {
     Down
 };
 
-enum class ButtonType {
-    Up,
-    Down,
-    Destination,
-    Open,
-    Close,
-    Help
-};
 
 #endif

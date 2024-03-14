@@ -1,12 +1,12 @@
 #include "Display.h"
 
-Display::Display(){
-
+Display::Display(int elevatorNum){
+    this->elevatorNum = elevatorNum;
 }
-void Display::displayFloor(int elevatorNum, int floorNum){
+void Display::displayFloor(int floorNum){
     emit displayFloorSignal(elevatorNum, floorNum);
 }
 
-void Display::displayMessage(int elevatorNum, string message){
+void Display::displayMessage(string message){
     emit displayMessageSignal(elevatorNum, message);
 }
