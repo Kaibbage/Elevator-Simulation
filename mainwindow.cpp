@@ -135,11 +135,6 @@ MainWindow::MainWindow(QWidget *parent)
         elevatorDoorLayout.push_back(eDoor);
         connect(ecs->getElevators().at(i)->getElevatorDoor(), SIGNAL(sendDoorOpenSignal(int, bool)), this, SLOT(manageElevatorDoor(int, bool)));
         elevatorDoorLayout.at(i)->setStyleSheet("background-color: red;");
-        ui->addWeightButton->setDisabled(true);
-        ui->removeWeightButton->setDisabled(true);
-        ui->blockDoorButton->setDisabled(true);
-        ui->openDoorButton->setDisabled(true);
-        ui->closeDoorButton->setDisabled(true);
     }
     for(int i = 0; i < NUM_FLOORS; i++){
         QTextBrowser *fDoor = new QTextBrowser(ui->centralwidget);
@@ -480,21 +475,24 @@ void MainWindow::changeElevator(){
     }
 
     //If door is open or closed then allowing user to do certain actions
-    if(ecs->getElevators().at(currentElevatorNum)->isDoorOpen()){
-        ui->addWeightButton->setDisabled(false);
-        ui->removeWeightButton->setDisabled(false);
-        ui->blockDoorButton->setDisabled(false);
-        ui->openDoorButton->setDisabled(false);
-        ui->closeDoorButton->setDisabled(false);
+    if(!ecs->getElevators().at(currentElevatorNum)->getOutOfOrder()){
+        if(ecs->getElevators().at(currentElevatorNum)->isDoorOpen()){
+            ui->addWeightButton->setDisabled(false);
+            ui->removeWeightButton->setDisabled(false);
+            ui->blockDoorButton->setDisabled(false);
+            ui->openDoorButton->setDisabled(false);
+            ui->closeDoorButton->setDisabled(false);
 
+        }
+        else{
+            ui->addWeightButton->setDisabled(true);
+            ui->removeWeightButton->setDisabled(true);
+            ui->blockDoorButton->setDisabled(true);
+            ui->openDoorButton->setDisabled(true);
+            ui->closeDoorButton->setDisabled(true);
+        }
     }
-    else{
-        ui->addWeightButton->setDisabled(true);
-        ui->removeWeightButton->setDisabled(true);
-        ui->blockDoorButton->setDisabled(true);
-        ui->openDoorButton->setDisabled(true);
-        ui->closeDoorButton->setDisabled(true);
-    }
+
 
     //Allowing options for if help button has been clicked
     if(ecs->getElevators().at(currentElevatorNum)->getNeedHelp()){
@@ -606,24 +604,33 @@ void MainWindow::manageIlluminationDownButton(int floorNum, int destinationNum, 
 
 //Manages the openness of an elevator door, signaled from an elevator door object
 void MainWindow::manageElevatorDoor(int elevatorNum, bool open){
+    if(elevatorNum == currentElevatorNum && !ecs->getElevators().at(elevatorNum)->getOutOfOrder()){
+        if(open == true){
+            ui->addWeightButton->setDisabled(false);
+            ui->removeWeightButton->setDisabled(false);
+            ui->blockDoorButton->setDisabled(false);
+            ui->openDoorButton->setDisabled(false);
+            ui->closeDoorButton->setDisabled(false);
+        }
+        else{
+
+            ui->addWeightButton->setDisabled(true);
+            ui->removeWeightButton->setDisabled(true);
+            ui->blockDoorButton->setDisabled(true);
+            ui->openDoorButton->setDisabled(true);
+            ui->closeDoorButton->setDisabled(true);
+        }
+    }
     if(open == true){
         elevatorDoorLayout.at(elevatorNum)->setStyleSheet("background-color: green;");
-        ui->addWeightButton->setDisabled(false);
-        ui->removeWeightButton->setDisabled(false);
-        ui->blockDoorButton->setDisabled(false);
-        ui->openDoorButton->setDisabled(false);
-        ui->closeDoorButton->setDisabled(false);
         ui->console->append("door for Elevator " + QString::number(elevatorNum+1) + " has opened");
     }
     else{
         elevatorDoorLayout.at(elevatorNum)->setStyleSheet("background-color: red;");
-        ui->addWeightButton->setDisabled(true);
-        ui->removeWeightButton->setDisabled(true);
-        ui->blockDoorButton->setDisabled(true);
-        ui->openDoorButton->setDisabled(true);
-        ui->closeDoorButton->setDisabled(true);
         ui->console->append("door for Elevator " + QString::number(elevatorNum+1) + " has closed");
     }
+
+
 
 }
 
@@ -700,6 +707,7 @@ void MainWindow::greyOutButtons(int elevatorNum, bool grey){
                 qDestButtons.at(i)->setDisabled(true);
                 qDestButtons.at(i)->setStyleSheet("background-color: gray;");
             }
+
 
             ui->blockDoorButton->setDisabled(true);
             ui->addWeightButton->setDisabled(true);

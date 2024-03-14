@@ -189,7 +189,7 @@ void ECS::weightOverloadRequest(int elevatorNum){
     elevators.at(elevatorNum)->stopElevatorForWeight();
     tenSecondTimers.at(elevatorNum)->stop();
 }
-'
+
 //Request from elevator that has escaped a wait overload, restarting timer as 2 seconds
 void ECS::weightGoodRequest(int elevatorNum){
     tenSecondTimers.at(elevatorNum)->setInterval(ELEVATOR_WAIT_TIME/5); //waiting for a little bit
