@@ -14,7 +14,6 @@ talks to ecs to talk to elevators
 gets instructions from ecs
 contains a pointer to the ecs
 button functionalities are contained in functions, buttons just light up is all
-Accessed as a pointer cuz it's a decently big class
 */
 class Floor {
 public:

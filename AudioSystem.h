@@ -11,6 +11,7 @@ using namespace std;
 /*
 AudioSystem class is very simple
 Represents an elevaotr audio system that outputs whatever message is sent to it
+Is a QObject
 */
 class AudioSystem: public QObject {
     Q_OBJECT

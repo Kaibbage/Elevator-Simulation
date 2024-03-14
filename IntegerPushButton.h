@@ -2,7 +2,10 @@
 #define INTEGERPUSHBUTTON_H
 #include <QApplication>
 #include <QPushButton>
-
+/*
+ * IntegerPush is a child of QPushButton
+ * Just a QPushButton that sends an integer with it when it is clicked (for the elevatorNum)
+*/
 class IntegerPushButton : public QPushButton {
     Q_OBJECT
 public:

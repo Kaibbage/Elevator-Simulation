@@ -4,6 +4,7 @@
 #include "IntegerPushButton.h"
 #include <QDebug>
 
+//Constructor for MainWindow, creates all objects and dynamically allocates all memory. Sets up all connections.
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
@@ -20,6 +21,7 @@ MainWindow::MainWindow(QWidget *parent)
         for(int j = 0; j < NUM_FLOORS; j++){
             Button* destinationButton = new Button(i, j);
             destinationButtons.push_back(destinationButton);
+
         }
         Button* openButton = new Button(i, DEFAULT_VALUE);
         Button* closeButton = new Button(i, DEFAULT_VALUE);
@@ -92,7 +94,14 @@ MainWindow::MainWindow(QWidget *parent)
         qDestButtons.push_back(button);
 
         connect(button, SIGNAL(intValueClicked(int)), this, SLOT(clickDestinationButton(int)));
-        connect(ecs->getElevators().front()->getDestinationButtons().at(i), SIGNAL(isIlluminatedSignal(int, int, bool)), this, SLOT(manageIlluminationDestinationButton(int, int, bool))); //have to change in change elevator
+    }
+
+    //connecting light up for destination buttons
+    for(int i = 0; i < NUM_ELEVATORS; i++){
+        for(int j = 0; j < NUM_FLOORS; j++){
+            connect(ecs->getElevators().at(i)->getDestinationButtons().at(j), SIGNAL(isIlluminatedSignal(int, int, bool)), this, SLOT(manageIlluminationDestinationButton(int, int, bool)));
+        }
+
     }
 
 
@@ -150,36 +159,35 @@ MainWindow::MainWindow(QWidget *parent)
 
     //connecting everything to first floor and first elevator (have to change all these in change floor/ change elevator
     //elevators
-    connect(ecs->getElevators().front()->getBell(), SIGNAL(ringBellSignal(int)), this, SLOT(ringBellGUI(int)));
-    connect(&bellTimer, SIGNAL(timeout()), this, SLOT(clearBellGUI()));
 
-    connect(ecs->getElevators().front()->getDisplay(), SIGNAL(displayFloorSignal(int, int)), this, SLOT(displayFloorGUI(int, int)));
-    connect(ecs->getElevators().front()->getDisplay(), SIGNAL(displayMessageSignal(int, string)), this, SLOT(displayMessageGUI(int, string)));
+    //Connecting certain things to all elevators
+    for(int i = 0; i < NUM_ELEVATORS; i++){
 
-    connect(ecs->getElevators().front()->getAudioSystem(), SIGNAL(outputAudioMessageSignal(int, string)), this, SLOT(outputAudioMessageGUI(int, string)));
-
-    connect(ecs->getElevators().front()->getHelpButton(), SIGNAL(isIlluminatedSignal(int, int, bool)), this, SLOT(manageIlluminationHelpButton(int, int, bool)));
-
-    connect(ecs->getElevators().front()->getOpenButton(), SIGNAL(isIlluminatedSignal(int, int, bool)), this, SLOT(manageIlluminationOpenButton(int, int, bool)));
-    connect(ecs->getElevators().front()->getCloseButton(), SIGNAL(isIlluminatedSignal(int, int, bool)), this, SLOT(manageIlluminationCloseButton(int, int, bool)));
-
-    //Connecting certain things to all elevators that might be necessary in some emergency case
-    for(int i = 1; i < NUM_ELEVATORS; i++){
         connect(ecs->getElevators().at(i)->getBell(), SIGNAL(ringBellSignal(int)), this, SLOT(ringBellGUI(int)));
 
         connect(ecs->getElevators().at(i)->getDisplay(), SIGNAL(displayFloorSignal(int, int)), this, SLOT(displayFloorGUI(int, int)));
         connect(ecs->getElevators().at(i)->getDisplay(), SIGNAL(displayMessageSignal(int, string)), this, SLOT(displayMessageGUI(int, string)));
 
         connect(ecs->getElevators().at(i)->getAudioSystem(), SIGNAL(outputAudioMessageSignal(int, string)), this, SLOT(outputAudioMessageGUI(int, string)));
+
+        connect(ecs->getElevators().at(i)->getHelpButton(), SIGNAL(isIlluminatedSignal(int, int, bool)), this, SLOT(manageIlluminationHelpButton(int, int, bool)));
+
+        connect(ecs->getElevators().at(i)->getOpenButton(), SIGNAL(isIlluminatedSignal(int, int, bool)), this, SLOT(manageIlluminationOpenButton(int, int, bool)));
+        connect(ecs->getElevators().at(i)->getCloseButton(), SIGNAL(isIlluminatedSignal(int, int, bool)), this, SLOT(manageIlluminationCloseButton(int, int, bool)));
+    }
+    //Making bell not last forever
+    connect(&bellTimer, SIGNAL(timeout()), this, SLOT(clearBellGUI()));
+
+
+
+
+    //connecting stuff to all floors
+    //floors
+    for(int i = 0; i < NUM_FLOORS; i++){
+        connect(ecs->getFloors().at(i)->getUpButton(), SIGNAL(isIlluminatedSignal(int, int, bool)), this, SLOT(manageIlluminationUpButton(int, int, bool)));
+        connect(ecs->getFloors().at(i)->getDownButton(), SIGNAL(isIlluminatedSignal(int, int, bool)), this, SLOT(manageIlluminationDownButton(int, int, bool)));
     }
 
-
-
-
-
-    //floors
-    connect(ecs->getFloors().front()->getUpButton(), SIGNAL(isIlluminatedSignal(int, int, bool)), this, SLOT(manageIlluminationUpButton(int, int, bool)));
-    connect(ecs->getFloors().front()->getDownButton(), SIGNAL(isIlluminatedSignal(int, int, bool)), this, SLOT(manageIlluminationDownButton(int, int, bool)));
 
 
 
@@ -259,6 +267,7 @@ MainWindow::MainWindow(QWidget *parent)
 
 }
 
+//Destructor, deleting all ui stuff and the ECS. The ECS will take care of the rest.
 MainWindow::~MainWindow()
 {
     delete ui;
@@ -286,7 +295,7 @@ MainWindow::~MainWindow()
 
 }
 
-
+//Rings the bell in the GUI
 void MainWindow::ringBellGUI(int elevatorNum){
     if(elevatorNum == currentElevatorNum){
         ui->bellTextBrowser->append("ring ring");
@@ -297,10 +306,12 @@ void MainWindow::ringBellGUI(int elevatorNum){
     ui->console->append("bell rings for Elevator " + QString::number(currentElevatorNum+1));
 }
 
+//Clears the bell in the GUI
 void MainWindow::clearBellGUI(){
     ui->bellTextBrowser->clear();
 }
 
+//Displays the current floor to the display in the GUI
 void MainWindow::displayFloorGUI(int elevatorNum, int floorNum){
     if(elevatorNum == currentElevatorNum){
         ui->displayTextBrowser->clear();
@@ -311,6 +322,7 @@ void MainWindow::displayFloorGUI(int elevatorNum, int floorNum){
 
 }
 
+//Displays a message to the display in the GUI
 void MainWindow::displayMessageGUI(int elevatorNum, string message){
     if(elevatorNum == currentElevatorNum){
         ui->displayTextBrowser->clear();
@@ -321,6 +333,7 @@ void MainWindow::displayMessageGUI(int elevatorNum, string message){
 
 }
 
+//Showing a message on the AudioSystem on the GUI
 void MainWindow::outputAudioMessageGUI(int elevatorNum, string audioMessage){
     if(elevatorNum == currentElevatorNum){
         ui->audioTextBrowser->clear();
@@ -333,22 +346,26 @@ void MainWindow::outputAudioMessageGUI(int elevatorNum, string audioMessage){
 
 }
 
+//Slot that clicking the up button connects to
 void MainWindow::clickUpButton(){
     ecs->getFloors().at(currentFloorNum)->pressUpButton();
 
     ui->console->append("Up Button clicked for Floor " + QString::number(currentFloorNum+1));
 }
 
+//Slot that clicking the down button connects to
 void MainWindow::clickDownButton(){
     ecs->getFloors().at(currentFloorNum)->pressDownButton();
     ui->console->append("Down Button clicked for Floor " + QString::number(currentFloorNum +1));
 }
 
+//Slot that clicking a destination button connects to
 void MainWindow::clickDestinationButton(int destButtonNum){
    ecs->getElevators().at(currentElevatorNum)->pressDestinationButton(destButtonNum);
    ui->console->append("Destination Button " + QString::number(destButtonNum+1) + " clicked for Elevator " + QString::number(currentElevatorNum+1));
 }
 
+//Slot that clicking the change floor button connects to, changes floor on GUI
 void MainWindow::changeFloor(){
     currentFloorNum++;
     if(currentFloorNum == NUM_FLOORS){
@@ -356,10 +373,6 @@ void MainWindow::changeFloor(){
     }
     ui->selectedFloorOnGUI->clear();
     ui->selectedFloorOnGUI->append(QString::number(currentFloorNum+1));
-
-    //connecting needed stuff
-    connect(ecs->getFloors().at(currentFloorNum)->getUpButton(), SIGNAL(isIlluminatedSignal(int, int, bool)), this, SLOT(manageIlluminationUpButton(int, int, bool)));
-    connect(ecs->getFloors().at(currentFloorNum)->getDownButton(), SIGNAL(isIlluminatedSignal(int, int, bool)), this, SLOT(manageIlluminationDownButton(int, int, bool)));
 
     //clearing buttons
     ui->upButton->setStyleSheet("");
@@ -388,6 +401,7 @@ void MainWindow::changeFloor(){
     }
 }
 
+//Slot that clicking the change elevator button connects to, changes elevator on GUI
 void MainWindow::changeElevator(){
     currentElevatorNum++;
     if(currentElevatorNum == NUM_ELEVATORS){
@@ -399,26 +413,11 @@ void MainWindow::changeElevator(){
     //clearing bell
     clearBellGUI();
 
-    //connecting needed stuff
-    connect(ecs->getElevators().at(currentElevatorNum)->getBell(), SIGNAL(ringBellSignal(int)), this, SLOT(ringBellGUI(int)));
-
-    connect(ecs->getElevators().at(currentElevatorNum)->getDisplay(), SIGNAL(displayFloorSignal(int, int)), this, SLOT(displayFloorGUI(int, int)));
-    connect(ecs->getElevators().at(currentElevatorNum)->getDisplay(), SIGNAL(displayMessageSignal(int, string)), this, SLOT(displayMessageGUI(int, string)));
-
-    connect(ecs->getElevators().at(currentElevatorNum)->getAudioSystem(), SIGNAL(outputAudioMessageSignal(int, string)), this, SLOT(outputAudioMessageGUI(int, string)));
-
-    connect(ecs->getElevators().at(currentElevatorNum)->getHelpButton(), SIGNAL(isIlluminatedSignal(int, int, bool)), this, SLOT(manageIlluminationHelpButton(int, int, bool)));
-
-    connect(ecs->getElevators().at(currentElevatorNum)->getOpenButton(), SIGNAL(isIlluminatedSignal(int, int, bool)), this, SLOT(manageIlluminationOpenButton(int, int, bool)));
-    connect(ecs->getElevators().at(currentElevatorNum)->getCloseButton(), SIGNAL(isIlluminatedSignal(int, int, bool)), this, SLOT(manageIlluminationCloseButton(int, int, bool)));
-
 
 
 
     //updating buttons and connecting stuff
     for(int i = 0; i < NUM_FLOORS; i++){
-        connect(ecs->getElevators().at(currentElevatorNum)->getDestinationButtons().at(i), SIGNAL(isIlluminatedSignal(int, int, bool)), this, SLOT(manageIlluminationDestinationButton(int, int, bool)));
-
         //clearing dest buttons
         qDestButtons.at(i)->setStyleSheet("");
         if(ecs->getElevators().at(currentElevatorNum)->getDestinationButtons().at(i)->isIlluminated()){
@@ -426,6 +425,7 @@ void MainWindow::changeElevator(){
             qDestButtons.at(i)->setStyleSheet("background-color: yellow;");
         }
     }
+
 
 
     //updating display (maybe check if weight is overloaded and display msg if so)
@@ -465,10 +465,7 @@ void MainWindow::changeElevator(){
     }
 
     //If this elevator is out of order then disabling stuff
-    if(!ecs->getElevators().at(currentElevatorNum)->getOutOfOrder()){
-        greyOutButtons(currentElevatorNum, false);
-    }
-    else{
+    if(ecs->getElevators().at(currentElevatorNum)->getOutOfOrder()){
         greyOutButtons(currentElevatorNum, true);
 
         ui->displayTextBrowser->clear();
@@ -476,6 +473,10 @@ void MainWindow::changeElevator(){
 
         ui->audioTextBrowser->clear();
         ui->audioTextBrowser->append(QString::fromStdString("Please exit immediately"));
+
+    }
+    else{
+        greyOutButtons(currentElevatorNum, false);
     }
 
     //If door is open or closed then allowing user to do certain actions
@@ -517,19 +518,24 @@ void MainWindow::changeElevator(){
 
 }
 
+//Slot that a timer connects to, moves movable elevators every unit of time
 void MainWindow::moveElevators(){
     ecs->moveElevatorsTowardsDestination();
 }
 
+//Simple function to show current floor Num
 void MainWindow::showFloorNum(int floorNum){
     ui->selectedFloorOnGUI->clear();
     ui->selectedFloorOnGUI->append(QString::number(floorNum+1));
 }
+
+//Simple function to show current elevator Num
 void MainWindow::showElevatorNum(int elevatorNum){
     ui->selectedElevatorOnGUI->clear();
     ui->selectedElevatorOnGUI->append(QString::number(elevatorNum+1));
 }
 
+//Updates elevator floor position display from floorsensor, signaled from floorsensors
 void MainWindow::floorSensorArrivedDisplay(int elevatorNum, int floorNum){
     if(floorNum != 0){
         elevatorFloorLayout.at(elevatorNum).at(floorNum-1)->setStyleSheet("background-color: white;");
@@ -542,39 +548,63 @@ void MainWindow::floorSensorArrivedDisplay(int elevatorNum, int floorNum){
     ui->console->append("Elevator " + QString::number(elevatorNum+1) + " has reached Floor " + QString::number(floorNum+1));
 }
 
+//Manages the illumination of destination buttons, signaled from button objects
 void MainWindow::manageIlluminationDestinationButton(int elevatorNum, int destinationNum, bool illuminate){
+    if(elevatorNum == currentElevatorNum){
+        if(illuminate == true){
+            qDestButtons.at(destinationNum)->setStyleSheet("background-color: yellow;");
+        }
+        else{
+            qDestButtons.at(destinationNum)->setStyleSheet("");
+        }
+    }
+
     if(illuminate == true){
-        qDestButtons.at(destinationNum)->setStyleSheet("background-color: yellow;");
         ui->console->append("Destination button " + QString::number(destinationNum+1) + " in Elevator " + QString::number(elevatorNum+1) + " has lit up");
     }
     else{
-        qDestButtons.at(destinationNum)->setStyleSheet("");
         ui->console->append("Destination button " + QString::number(destinationNum+1) + " in Elevator " + QString::number(elevatorNum+1) + " has turned off the light");
     }
+
 }
 
+//Manages the illumination of the up button, signaled from a button object
 void MainWindow::manageIlluminationUpButton(int floorNum, int destinationNum, bool illuminate){
-    if(illuminate == true && destinationNum < 0){
-        ui->upButton->setStyleSheet("background-color: yellow;");
+    if(destinationNum == DEFAULT_VALUE && floorNum == currentFloorNum){
+        if(illuminate == true){
+            ui->upButton->setStyleSheet("background-color: yellow;");
+        }
+        else{
+            ui->upButton->setStyleSheet("");
+        }
+    }
+    if(illuminate == true){
         ui->console->append("Up button in Floor " + QString::number(floorNum+1) + " has lit up");
     }
     else{
-        ui->upButton->setStyleSheet("");
         ui->console->append("Up button in Floor " + QString::number(floorNum+1) + " has turned off the light");
     }
 }
 
+//Manages the illumination of the down button, signaled from a button object
 void MainWindow::manageIlluminationDownButton(int floorNum, int destinationNum, bool illuminate){
+    if(destinationNum == DEFAULT_VALUE && floorNum == currentFloorNum){
+        if(illuminate == true && destinationNum < 0){
+            ui->downButton->setStyleSheet("background-color: yellow;");
+        }
+        else{
+            ui->downButton->setStyleSheet("");
+        }
+    }
     if(illuminate == true && destinationNum < 0){
-        ui->downButton->setStyleSheet("background-color: yellow;");
         ui->console->append("Down button in Floor " + QString::number(floorNum+1) + " has lit up");
     }
     else{
-        ui->downButton->setStyleSheet("");
         ui->console->append("Down button in Floor " + QString::number(floorNum+1) + " has turned off the light");
     }
 }
 
+//Manages the openness of an elevator door, signaled from an elevator door object
 void MainWindow::manageElevatorDoor(int elevatorNum, bool open){
     if(open == true){
         elevatorDoorLayout.at(elevatorNum)->setStyleSheet("background-color: green;");
@@ -596,6 +626,8 @@ void MainWindow::manageElevatorDoor(int elevatorNum, bool open){
     }
 
 }
+
+//Manages the openness of a floor door, signaled from a floor door object
 void MainWindow::manageFloorDoor(int floorNum, bool open){
     if(open == true){
         floorDoorLayout.at(floorNum)->setStyleSheet("background-color: green;");
@@ -608,6 +640,7 @@ void MainWindow::manageFloorDoor(int floorNum, bool open){
 
 }
 
+//Slot to add weight to elevator
 void MainWindow::addWeightSlot(){
     int weightToAdd = ui->addWeightTextEdit->toPlainText().toInt();
     ecs->getElevators().at(currentElevatorNum)->increaseWeight(weightToAdd);
@@ -621,6 +654,7 @@ void MainWindow::addWeightSlot(){
 
 }
 
+//Slot to remove weight from elevator
 void MainWindow::removeWeightSlot(){
     int weightToRemove = ui->addWeightTextEdit->toPlainText().toInt();
     ecs->getElevators().at(currentElevatorNum)->decreaseWeight(weightToRemove);
@@ -633,56 +667,35 @@ void MainWindow::removeWeightSlot(){
     ui->console->append(QString::number(weightToRemove) + " units of weight has been removed");
 }
 
+//Slot to return to normal floor display after displaying some emergency message
 void MainWindow::goBackToFloorDisplay(int floorNum){
     displayFloorGUI(currentElevatorNum, floorNum);
     outputAudioMessageGUI(currentElevatorNum, "");
 }
 
+//Slot that block door button connects to
 void MainWindow::blockDoor(){
     ecs->getElevators().at(currentElevatorNum)->blockLightSensor();
     ui->console->append("The door has been blocked for Elevator" + QString::number(currentElevatorNum+1));
 }
 
+//Slot that fire button connects to
 void MainWindow::elevatorFire(){
     ecs->fireRequestFromElevator(currentElevatorNum);
     ui->console->append("There is a fire in Elevator" + QString::number(currentElevatorNum+1));
 }
 
+//Slot that ECS calls to tell mainWindow that a certain elevator is out of order
 void MainWindow::outOfOrder(int elevatorNum){
     greyOutButtons(elevatorNum, true);
     ui->console->append("Elevator" + QString::number(currentElevatorNum+1) + " is now out of order");
 
 }
 
+//Slot to disable all buttons when an elevator is out of order or to reset buttons when switching elevators
 void MainWindow::greyOutButtons(int elevatorNum, bool grey){
     if(elevatorNum == currentElevatorNum){
-        if(!grey){
-            for(int i = 0; i < NUM_FLOORS; i++){
-                qDestButtons.at(i)->setDisabled(false);
-                qDestButtons.at(i)->setStyleSheet("");
-            }
-
-            ui->blockDoorButton->setDisabled(false);
-            ui->addWeightButton->setDisabled(false);
-            ui->removeWeightButton->setDisabled(false);
-            ui->helpButton->setDisabled(false);
-            ui->fireButton->setDisabled(false);
-            ui->openDoorButton->setDisabled(false);
-            ui->closeDoorButton->setDisabled(false);
-            ui->talkButton->setDisabled(false);
-
-            ui->blockDoorButton->setStyleSheet("");
-            ui->addWeightButton->setStyleSheet("");
-            ui->removeWeightButton->setStyleSheet("");
-            ui->helpButton->setStyleSheet("");
-            ui->fireButton->setStyleSheet("");
-            ui->openDoorButton->setStyleSheet("");
-            ui->closeDoorButton->setStyleSheet("");
-            ui->talkButton->setStyleSheet("");
-
-
-        }
-        else{
+        if(grey){
             for(int i = 0; i < NUM_FLOORS; i++){
                 qDestButtons.at(i)->setDisabled(true);
                 qDestButtons.at(i)->setStyleSheet("background-color: gray;");
@@ -707,98 +720,156 @@ void MainWindow::greyOutButtons(int elevatorNum, bool grey){
             ui->talkButton->setStyleSheet("background-color: gray;");
 
         }
+        else{
+
+
+            for(int i = 0; i < NUM_FLOORS; i++){
+                qDestButtons.at(i)->setDisabled(false);
+            }
+
+            ui->blockDoorButton->setDisabled(false);
+            ui->addWeightButton->setDisabled(false);
+            ui->removeWeightButton->setDisabled(false);
+            ui->helpButton->setDisabled(false);
+            ui->fireButton->setDisabled(false);
+            ui->openDoorButton->setDisabled(false);
+            ui->closeDoorButton->setDisabled(false);
+            ui->talkButton->setDisabled(false);
+
+            ui->blockDoorButton->setStyleSheet("");
+            ui->addWeightButton->setStyleSheet("");
+            ui->removeWeightButton->setStyleSheet("");
+            ui->helpButton->setStyleSheet("");
+            ui->fireButton->setStyleSheet("");
+            ui->openDoorButton->setStyleSheet("");
+            ui->closeDoorButton->setStyleSheet("");
+            ui->talkButton->setStyleSheet("");
+
+        }
     }
 
 }
 
+//Slot that building fire button connects to
 void MainWindow::buildingFire(){
     ecs->fireRequestFromBuilding();
 
     ui->console->append("There is a fire in the building");
 }
 
+//Slot that building power outage connects to
 void MainWindow::buildingPowerOutage(){
     ecs->powerOutageRequest();
 
     ui->console->append("There is a power outage in the building");
 }
 
+//Slot that help button connects to
 void MainWindow::helpButtonPressed(){
     ecs->getElevators().at(currentElevatorNum)->pressHelpButton();
     ui->talkButton->setDisabled(false);
 
     ui->console->append("The help button has been pressed for Elevator " + QString::number(currentElevatorNum+1));
 }
+
+//Slot to tell user building safety has been called, signaled from building
 void MainWindow::buildingSafetyCalled(int elevatorNum){
     ui->console->append("Elevator " + QString::number(elevatorNum+1) + " has called building safety.");
     ui->talkButton->setDisabled(true);
 }
+
+//Slot to tell user that they have talked and 911 will not be called, signaled from building
 void MainWindow::passengerTalked(int elevatorNum){
     ui->console->append("Elevator " + QString::number(elevatorNum+1) + " has talked to building safety. Proceeding as normal.");
     ui->talkButton->setDisabled(true);
 }
+
+//Slot to tell user that 911 has been called, signaled from building
 void MainWindow::called911(int elevatorNum){
     ui->console->append("Elevator " + QString::number(elevatorNum+1) + " has not spoken for 5 seconds, 911 has been called.");
 }
+
+//Slot that talk button connects to, used to talk
 void MainWindow::talkButtonPressed(){
     ecs->getElevators().at(currentElevatorNum)->talk();
 }
 
+//Manages the illumination of a help button, signaled from a button object
 void MainWindow::manageIlluminationHelpButton(int elevatorNum, int destinationNum, bool isIlluminated){
-    if(destinationNum == DEFAULT_VALUE){
+    if(destinationNum == DEFAULT_VALUE && elevatorNum == currentElevatorNum){
         if(isIlluminated){
             ui->helpButton->setStyleSheet("background-color: yellow;");
-            ui->console->append("Help button in Elevator " + QString::number(elevatorNum+1) + " has lit up");
         }
         else{
             ui->helpButton->setStyleSheet("");
-            ui->console->append("Help button in Elevator " + QString::number(elevatorNum+1) + " has turned off the light");
         }
 
     }
+    if(isIlluminated){
+        ui->console->append("Help button in Elevator " + QString::number(elevatorNum+1) + " has lit up");
+    }
+    else{
+        ui->console->append("Help button in Elevator " + QString::number(elevatorNum+1) + " has turned off the light");
+    }
 }
 
+//Slot that open button connects to
 void MainWindow::openDoorButtonPressed(){
     ecs->getElevators().at(currentElevatorNum)->pressOpenDoorButton();
     ui->console->append("The open door button has been pressed for Elevator " + QString::number(currentElevatorNum+1));
 }
+
+//Slot that close button connects to
 void MainWindow::closeDoorButtonPressed(){
     ecs->getElevators().at(currentElevatorNum)->pressCloseDoorButton();
     ui->console->append("The close door button has been pressed for Elevator " + QString::number(currentElevatorNum+1));
 }
 
+//Slot that open button connects to when released
 void MainWindow::openDoorButtonLetGo(){
     ecs->getElevators().at(currentElevatorNum)->letGoOpenDoorButton();
     ui->console->append("The open door button has been released for Elevator " + QString::number(currentElevatorNum+1));
 }
+
+//Slot that close button connects to when released
 void MainWindow::closeDoorButtonLetGo(){
     ecs->getElevators().at(currentElevatorNum)->letGoCloseDoorButton();
 }
 
+//Manages the illumination of an open button, signaled from a button object
 void MainWindow::manageIlluminationOpenButton(int elevatorNum, int destinationNum, bool isIlluminated){
-    if(destinationNum == DEFAULT_VALUE){
+    if(destinationNum == DEFAULT_VALUE && elevatorNum == currentElevatorNum){
         if(isIlluminated){
             ui->openDoorButton->setStyleSheet("background-color: yellow;");
-            ui->console->append("Open button in Elevator " + QString::number(elevatorNum+1) + " has lit up");
         }
         else{
             ui->openDoorButton->setStyleSheet("");
-            ui->console->append("Open button in Elevator " + QString::number(elevatorNum+1) + " has turned off the light");
         }
 
     }
+    if(isIlluminated){
+        ui->console->append("Open button in Elevator " + QString::number(elevatorNum+1) + " has lit up");
+    }
+    else{
+        ui->console->append("Open button in Elevator " + QString::number(elevatorNum+1) + " has turned off the light");
+    }
 }
 
+//Manages the illumination of a close button, signaled from a button object
 void MainWindow::manageIlluminationCloseButton(int elevatorNum, int destinationNum, bool isIlluminated){
-    if(destinationNum== DEFAULT_VALUE){
+    if(destinationNum== DEFAULT_VALUE && elevatorNum == currentElevatorNum){
         if(isIlluminated){
             ui->closeDoorButton->setStyleSheet("background-color: yellow;");
-            ui->console->append("Close button in Elevator " + QString::number(elevatorNum+1) + " has lit up");
         }
         else{
             ui->closeDoorButton->setStyleSheet("");
-            ui->console->append("Close button in Elevator " + QString::number(elevatorNum+1) + " has turned off the light");
         }
 
+    }
+    if(isIlluminated){
+        ui->console->append("Close button in Elevator " + QString::number(elevatorNum+1) + " has lit up");
+    }
+    else{
+        ui->console->append("Close button in Elevator " + QString::number(elevatorNum+1) + " has turned off the light");
     }
 }

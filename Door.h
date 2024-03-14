@@ -6,7 +6,7 @@
 /*
 Door class is very simple
 Represents an elevator or floor door and just remembers whether it is open or not
-Not accessed as a pointer because it is small and each floor sensor is only accessed by one object (elevator)
+Is a QObject
 */
 class Door: public QObject {
 Q_OBJECT

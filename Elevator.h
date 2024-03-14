@@ -19,7 +19,6 @@ Talks to ECS to get instructions
 Passengers talk to elevator, elevator talks to ECS and gets instructions
 Checks with light and weight sensors
 Contains a poitner to the ecs
-accessed as a pointer as it is a huge object and multiple classes may need to access the same elevator (there can be more than 1 tho)
 */
 class Elevator {
 public:

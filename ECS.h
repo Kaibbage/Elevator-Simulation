@@ -17,6 +17,7 @@ using namespace std;
 
 /*
 ECS class
+ECS stands for Elevator Control System
 holds elevator floor queues since this is the one who manages when to stop
 big boss
 floors use it to talk to elevators
@@ -24,7 +25,8 @@ elevators use it to talk to floors
 assigns floor requests to elevators
 All requests that come to an elevator come here first to get instructions for the elevator
 Controls all elevators and all floors
-Accessed by classes as a pointer since it is a large object and all classes should access the same ecs
+Same ECS is accessed by all classes
+Is a QObject
 */
 class ECS: public QObject {
     Q_OBJECT

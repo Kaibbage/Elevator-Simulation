@@ -8,6 +8,13 @@
 #include <QLabel>
 #include "ECS.h"
 
+/*
+ * MainWindow class,
+ * Manages creationg of all objects
+ * Manages ui
+ * Communicates with ecs and floor and elevators (through ecs) from ui input
+ * Shows what's happening on ui
+*/
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE

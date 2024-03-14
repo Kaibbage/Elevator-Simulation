@@ -2,6 +2,10 @@
 #define INTEGERTIMER_H
 #include <QTimer>
 
+/*
+ * IntegerTimer is a child of QTimer
+ * Just a QTimer that sends an integer with it when it times out (for the elevatorNum)
+*/
 class IntegerTimer : public QTimer {
     Q_OBJECT
 public:

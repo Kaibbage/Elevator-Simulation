@@ -11,7 +11,7 @@ using namespace std;
 /*
 Bell class is very simple
 Represents an elevator Bell that outputs the bell message when called
-Not accessed as a pointer because it is small and each floor sensor is only accessed by one object (elevator)
+Is a QObject
 */
 
 class Bell: public QObject {

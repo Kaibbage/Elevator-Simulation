@@ -10,6 +10,7 @@ Calls ecs for emergencies
 ECS can communicate back
 contains a pointer to the ecs
 accessed as a pointer because it is sometimes accessed by multiple classes and we want them to only access this one building
+Is a QObject
 */
 class Building: public QObject {
     Q_OBJECT

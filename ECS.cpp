@@ -1,6 +1,7 @@
 #include "ECS.h"
 #include <iostream>
 
+//Constructor, sets some attributes to default values, sets others to parameters
 ECS::ECS(vector<Elevator*>& elevators, vector<Floor*>& floors, vector<vector<FloorSensor*>>& allSetsOfFloorSensors, Building* building){
     this->elevators = elevators;
     this->floors = floors;
@@ -52,6 +53,8 @@ ECS::ECS(vector<Elevator*>& elevators, vector<Floor*>& floors, vector<vector<Flo
 
 
 }
+
+//Destructor, deletes all elevators and floors as well as other things belonging to ECS
 ECS::~ECS(){
     for(int i = 0; i < NUM_ELEVATORS; i++){
         delete elevators.at(i);
@@ -73,11 +76,13 @@ ECS::~ECS(){
     delete building;
 }
 
+//Assigns a floor to an elevator
 void ECS::assignToElevatorQueue(int elevatorNum, int floorNum){
     floorQueues.at(elevatorNum).push(floorNum);
     lastElementsInQueues.at(elevatorNum) = floorNum;
 }
 
+//Assigns a floor request to an elevator
 void ECS::addStartingFloorRequest(int floorNum, Direction direction){
     int closest = NUM_FLOORS;
 
@@ -102,12 +107,13 @@ void ECS::addStartingFloorRequest(int floorNum, Direction direction){
 
     assignToElevatorQueue(chosenElevatorNum, floorNum);
     elevatorDirectionValues.at(chosenElevatorNum) = direction;
-    if(floorQueues.at(chosenElevatorNum).size() == 1){
+    if(floorQueues.at(chosenElevatorNum).size() == 1 && !elevators.at(chosenElevatorNum)->getOutOfOrder()){
         areElevatorsReadyToMove.at(chosenElevatorNum) = true;
     }
 
 }
 
+//Assigns a destination request to an elevator
 void ECS::addDestinationFloorRequest(int elevatorNum, int floorNum){
     assignToElevatorQueue(elevatorNum, floorNum);
     if(floorQueues.at(elevatorNum).size() == 1 && !elevators.at(elevatorNum)->getElevatorDoor()->isDoorOpen()){
@@ -122,7 +128,7 @@ void ECS::addDestinationFloorRequest(int elevatorNum, int floorNum){
     }
 }
 
-
+//Updates the floor for an elevator, if it is at the front of the queue then arriving
 void ECS::updateElevatorFloor(int elevatorNum, int floorNum){
     currentElevatorFloorNumbers.at(elevatorNum) = floorNum;
 
@@ -131,7 +137,7 @@ void ECS::updateElevatorFloor(int elevatorNum, int floorNum){
     }
 }
 
-
+//If elevators can move, they are moved one floor towards their destination
 void ECS::moveElevatorsTowardsDestination(){
     for(int i = 0; i < NUM_ELEVATORS; i++){
         if(areElevatorsReadyToMove.at(i) && floorQueues.at(i).size() > 0){
@@ -150,12 +156,12 @@ void ECS::moveElevatorsTowardsDestination(){
     }
 }
 
-
+//getter
 int ECS::getElevatorFloorNum(int elevatorNum){
     return currentElevatorFloorNumbers.at(elevatorNum);
 }
 
-
+//Function called 10 seconds after arriving/opening doors to leave/close doors
 void ECS::readyToGoAfterTenSeconds(int elevatorNum){
     elevators.at(elevatorNum)->startElevator();
     floors.at(currentElevatorFloorNumbers.at(elevatorNum))->leaving();
@@ -163,6 +169,8 @@ void ECS::readyToGoAfterTenSeconds(int elevatorNum){
     areElevatorsReadyToMove.at(elevatorNum) = true;
 }
 
+
+//Function to start timer and tell elevators and floors that they've arrived
 void ECS::arrivedAtADesiredFloor(int elevatorNum, int floorNum){
     tenSecondTimers.at(elevatorNum)->setInterval(ELEVATOR_WAIT_TIME); //only 3 seconds for now
     tenSecondTimers.at(elevatorNum)->setSingleShot(true);
@@ -176,12 +184,13 @@ void ECS::arrivedAtADesiredFloor(int elevatorNum, int floorNum){
 
 }
 
-
+//Request from elevator that has a weight overload, stopping timer
 void ECS::weightOverloadRequest(int elevatorNum){
     elevators.at(elevatorNum)->stopElevatorForWeight();
     tenSecondTimers.at(elevatorNum)->stop();
 }
-
+'
+//Request from elevator that has escaped a wait overload, restarting timer as 2 seconds
 void ECS::weightGoodRequest(int elevatorNum){
     tenSecondTimers.at(elevatorNum)->setInterval(ELEVATOR_WAIT_TIME/5); //waiting for a little bit
     tenSecondTimers.at(elevatorNum)->setSingleShot(true);
@@ -190,7 +199,7 @@ void ECS::weightGoodRequest(int elevatorNum){
     emit goBackToFloorDisplaySignal(elevatorNum);
 }
 
-
+//Request from elevator that has its doors blocked once, restart timer
 void ECS::blockedDoorOnceRequest(int elevatorNum){
     tenSecondTimers.at(elevatorNum)->stop();
     tenSecondTimers.at(elevatorNum)->setInterval(ELEVATOR_WAIT_TIME); //waiting for a little bit
@@ -198,22 +207,27 @@ void ECS::blockedDoorOnceRequest(int elevatorNum){
     tenSecondTimers.at(elevatorNum)->start();
 }
 
+//Request from elevator that has its doors blocked more than once, restart timer and output messages
 void ECS::blockedDoorMultipleRequest(int elevatorNum){
     blockedDoorOnceRequest(elevatorNum);
     elevators.at(elevatorNum)->stopElevatorForBlockedMoreThanOnce();
 
 }
+
+//Request from elevator that the doors are no longer blocked when the timer ends
 void ECS::unblockedDoorRequest(int elevatorNum){
     elevators.at(elevatorNum)->unblockLightSensor();
     emit goBackToFloorDisplaySignal(elevatorNum);
 }
 
+//Request from elevator that there is a fire, assigns to closest floor
 void ECS::fireRequestFromElevator(int elevatorNum){
     elevators.at(elevatorNum)->fire();
     assignToClosestFloorEmergency(elevatorNum);
     tenSecondTimers.at(elevatorNum)->disconnect();
 }
 
+//Empties current e queue and assigns an elevator to the closest floor in case of emergency
 void ECS::assignToClosestFloorEmergency(int elevatorNum){
     while(!floorQueues.at(elevatorNum).empty()){
         floorQueues.at(elevatorNum).pop();
@@ -222,11 +236,13 @@ void ECS::assignToClosestFloorEmergency(int elevatorNum){
     areElevatorsReadyToMove.at(elevatorNum) = true;
 }
 
+//Sends a signal that an elevator is out of order after an emergency
 void ECS::noLongerRunning(int elevatorNum){
     emit outOfOrderSignal(elevatorNum);
 
 }
 
+//Request from building for a fire, tells all elevators there's a fire
 void ECS::fireRequestFromBuilding(){
     for(int i = 0; i < NUM_ELEVATORS; i++){
         elevators.at(i)->fire();
@@ -235,6 +251,7 @@ void ECS::fireRequestFromBuilding(){
     }
 }
 
+//Request from building for a power outage, tells all elevators there's a power outage
 void ECS::powerOutageRequest(){
     for(int i = 0; i < NUM_ELEVATORS; i++){
         elevators.at(i)->powerOutage();
@@ -243,21 +260,27 @@ void ECS::powerOutageRequest(){
     }
 }
 
+//Request from elevator that the help button has been pressed, starts a timer to call 911
 void ECS::helpButtonRequest(int elevatorNum){
     helpButtonTimers.at(elevatorNum)->setInterval(TIME_TO_CALL_911);
     helpButtonTimers.at(elevatorNum)->setSingleShot(true);
     helpButtonTimers.at(elevatorNum)->start();
     building->callBuildingSafety(elevatorNum);
 }
+
+//The user talks, elevator tells ECS with this function, stops timer
 void ECS::talk(int elevatorNum){
     helpButtonTimers.at(elevatorNum)->stop();
     building->talkToBuildingSafety(elevatorNum);
 }
 
+//The user doesn't talk before the timer ends and 911 is called thru the building
 void ECS::passengerNoTalk(int elevatorNum){
     building->call911(elevatorNum);
     elevators.at(elevatorNum)->setNeedHelp(true);
 }
+
+//Setter for starting floor values
 void ECS::setStartingFloorValues(vector<int>& startingFloors){
     if(startingFloors.size() == currentElevatorFloorNumbers.size()){
         currentElevatorFloorNumbers = startingFloors;
@@ -265,22 +288,25 @@ void ECS::setStartingFloorValues(vector<int>& startingFloors){
 
 }
 
-//for pressed
+//for open button pressed, stops timer to leave
 void ECS::openButtonRequest(int elevatorNum){
     tenSecondTimers.at(elevatorNum)->stop();
 }
+
+//For close button pressed, stops timer to leave and leaves immediately
 void ECS::closeButtonRequest(int elevatorNum){
     tenSecondTimers.at(elevatorNum)->stop();
     readyToGoAfterTenSeconds(elevatorNum);
 }
 
+//For open button let go, timer to leave restarted at 5 seconds
 void ECS::letGoOpenButtonRequest(int elevatorNum){
     tenSecondTimers.at(elevatorNum)->setInterval(ELEVATOR_WAIT_TIME/2); //waiting for half the time
     tenSecondTimers.at(elevatorNum)->setSingleShot(true);
     tenSecondTimers.at(elevatorNum)->start();
 }
 
-
+//getters
 vector<Floor*>& ECS::getFloors(){
     return floors;
 }
